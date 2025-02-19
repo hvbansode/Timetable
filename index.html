@@ -1,9 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Daily Activity Breakdown chart showing how time is spent throughout the day">
   <title>Daily Activity Breakdown</title>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      margin: 0;
+      background-color: #f4f4f4;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #chart_div {
+      width: 100%;
+      height: 600px;
+    }
+
     .google-visualization-legend {
       width: 100%;
       overflow-x: auto;
@@ -15,14 +35,12 @@
       margin-right: 10px;
       vertical-align: top;
     }
-    .google-visualization-legend-item text {
-      word-wrap: break-word;
-      max-width: 150px;
-    }
 
-    #chart_div {
-      width: 100%;
-      height: 600px;
+    footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: #666;
     }
   </style>
   <script type="text/javascript">
@@ -54,7 +72,6 @@
       var options = {
         title: 'Daily Activity Breakdown',
         subtitle: 'A breakdown of how time is spent throughout the day',
-        //pieSliceText: 'percentage', // If you want to hide all percentages
         legend: {
           position: 'bottom',
           textStyle: {
@@ -70,7 +87,7 @@
         },
         slices: {
           0: {offset: 0.1},
-          8: {textStyle: {color: 'transparent'}} // Hide percentage for Lunch & Relax
+          8: {textStyle: {color: 'transparent'}}
         },
         animation: {
           startup: true,
@@ -94,6 +111,10 @@
   </script>
 </head>
 <body>
-  <div id="chart_div"></div>
+  <h1>Daily Activity Breakdown</h1>
+  <div id="chart_div" aria-label="Chart showing daily activity breakdown"></div>
+  <footer>
+    © 2025 Daily Activity Breakdown | Designed to enhance user experience
+  </footer>
 </body>
 </html>
