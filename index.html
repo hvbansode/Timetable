@@ -1,151 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Daily Activity Breakdown chart showing how time is spent throughout the day">
-  <title>Daily Activity Breakdown</title>
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      margin: 0;
-      background-color: #f4f4f4;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 2em;
-    }
-
-    #chart_div {
-      width: 100%;
-      max-width: 100%;
-      height: 600px;
-    }
-
-    .google-visualization-legend {
-      width: 100%;
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-
-    .google-visualization-legend-item {
-      display: inline-block;
-      margin-right: 10px;
-      vertical-align: top;
-    }
-
-    footer {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 0.9em;
-      color: #666;
-    }
-
-    /* Responsive Styles */
-    @media (max-width: 768px) {
-      #chart_div {
-        height: 400px;
-      }
-
-      h1 {
-        font-size: 1.5em;
-      }
-
-      body {
-        padding: 10px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      #chart_div {
-        height: 300px;
-      }
-
-      h1 {
-        font-size: 1.2em;
-      }
-
-      footer {
-        font-size: 0.8em;
-      }
-
-      .google-visualization-legend {
-        font-size: 0.8em;
-      }
-    }
-  </style>
-  <script type="text/javascript">
-    google.charts.load('current', {'packages':['corechart']});
-    google.charts.setOnLoadCallback(drawChart);
-
-    function drawChart() {
-      var data = google.visualization.arrayToDataTable([
-        ['Activity', 'Hours'],
-        ['Morning Routine (5:30-6:00 AM)', 0.5],
-        ['Meditation (6:00-6:30 AM)', 0.5],
-        ['Light Exercise (6:30-7:00 AM)', 0.5],
-        ['Study Session 1 (7:00-8:30 AM)', 1.5],
-        ['Breakfast & News (8:30-9:00 AM)', 0.5],
-        ['Study Session 2 (9:00 AM - 12:00 PM)', 3],
-        ['Short Break (12:00-12:30 PM)', 0.5],
-        ['Mock Test (12:30-2:30 PM)', 2],
-        ['Lunch & Relax (2:30-3:30 PM)', 1],
-        ['Study Session 3 (3:30-5:30 PM)', 2],
-        ['Break (5:30-6:00 PM)', 0.5],
-        ['Study Session 4 (6:00-7:30 PM)', 1.5],
-        ['Dinner & Talk (7:30-8:00 PM)', 0.5],
-        ['Light Reading (8:00-9:30 PM)', 1.5],
-        ['Planning (9:30-10:00 PM)', 0.5],
-        ['Sleep Prep (10:00-10:30 PM)', 0.5],
-        ['Sleep (10:30 PM - 5:30 AM)', 7]
-      ]);
-
-      var options = {
-        title: 'Daily Activity Breakdown',
-        subtitle: 'A breakdown of how time is spent throughout the day',
-        legend: {
-          position: 'bottom',
-          textStyle: {
-            fontSize: 14
-          },
-          alignment: 'center'
-        },
-        tooltip: {
-          isHtml: true,
-          textStyle: {
-            fontSize: 12
-          }
-        },
-        slices: {
-          0: {offset: 0.1},
-          8: {textStyle: {color: 'transparent'}}
-        },
-        animation: {
-          startup: true,
-          duration: 1000,
-          easing: 'out'
-        },
-        colors: ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#795548', '#9E9E9E', '#607D8B'],
-        width: '100%',
-        height: 600,
-        chartArea: {
-          left: 'auto',
-          right: 'auto',
-          top: 50,
-          bottom: 100
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Daily Activity Breakdown chart showing how time is spent throughout the day">
+    <title>Daily Activity Breakdown</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f4f4;
+            color: #333;
         }
-      };
 
-      var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
-      chart.draw(data, options);
-    }
-  </script>
+        .container {
+            max-width: 960px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2em;
+            color: #007bff;
+        }
+
+        #chart_div {
+            width: 100%;
+            height: 500px; /* Initial height */
+        }
+
+        .google-visualization-legend {
+            width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .google-visualization-legend-item {
+            display: inline-block;
+            margin: 0 10px;
+            vertical-align: top;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .container {
+                padding: 15px;
+            }
+            #chart_div {
+                height: 400px;
+            }
+            h1 {
+                font-size: 1.7em;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #chart_div {
+                height: 350px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+
+        @media (max-width: 576px) {
+            #chart_div {
+                height: 300px;
+            }
+            h1 {
+                font-size: 1.2em;
+            }
+            .google-visualization-legend {
+                font-size: 0.8em;
+            }
+        }
+    </style>
+    <script type="text/javascript">
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            var data = google.visualization.arrayToDataTable([
+                ['Activity', 'Hours'],
+                ['Morning Routine (5:30-6:00 AM)', 0.5],
+                ['Meditation (6:00-6:30 AM)', 0.5],
+                ['Light Exercise (6:30-7:00 AM)', 0.5],
+                ['Study Session 1 (7:00-8:30 AM)', 1.5],
+                ['Breakfast & News (8:30-9:00 AM)', 0.5],
+                ['Study Session 2 (9:00 AM - 12:00 PM)', 3],
+                ['Short Break (12:00-12:30 PM)', 0.5],
+                ['Mock Test (12:30-2:30 PM)', 2],
+                ['Lunch & Relax (2:30-3:30 PM)', 1],
+                ['Study Session 3 (3:30-5:30 PM)', 2],
+                ['Break (5:30-6:00 PM)', 0.5],
+                ['Study Session 4 (6:00-7:30 PM)', 1.5],
+                ['Dinner & Talk (7:30-8:00 PM)', 0.5],
+                ['Light Reading (8:00-9:30 PM)', 1.5],
+                ['Planning (9:30-10:00 PM)', 0.5],
+                ['Sleep Prep (10:00-10:30 PM)', 0.5],
+                ['Sleep (10:30 PM - 5:30 AM)', 7]
+            ]);
+
+            var options = {
+                title: 'Daily Activity Breakdown',
+                subtitle: 'A breakdown of how time is spent throughout the day',
+                legend: {
+                    position: 'bottom',
+                    textStyle: {
+                        fontSize: 14
+                    },
+                    alignment: 'center'
+                },
+                tooltip: {
+                    isHtml: true,
+                    textStyle: {
+                        fontSize: 12
+                    }
+                },
+                slices: {
+                    0: {offset: 0.1},
+                    16: {textStyle: {color: 'transparent'}}
+                },
+                animation: {
+                    startup: true,
+                    duration: 1000,
+                    easing: 'out'
+                },
+                colors: ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#795548', '#9E9E9E', '#607D8B'],
+                width: '100%',
+                height: 500,  // Initial height
+                chartArea: {
+                    left: 'auto',
+                    right: 'auto',
+                    top: 50,
+                    bottom: 100
+                },
+                responsive: true // Key for responsiveness
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+            chart.draw(data, options);
+
+            window.addEventListener('resize', function() {
+                chart.draw(data, options);
+            });
+        }
+    </script>
 </head>
 <body>
-  <div id="chart_div" aria-label="Chart showing daily activity breakdown"></div>
+    <div class="container">
+        <h1>Daily Activity Breakdown</h1>
+        <div id="chart_div" aria-label="Chart showing daily activity breakdown"></div>
+    </div>
+    <footer>
+    </footer>
 </body>
 </html>
