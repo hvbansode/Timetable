@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Daily Activity Breakdown chart showing how time is spent throughout the day">
+    <meta description content="Daily Activity Breakdown chart showing how time is spent throughout the day">
     <title>Daily Activity Breakdown</title>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
+        /* Embedded CSS */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            background-color: #f4f4f4;
-            color: #333;
+            background-color: #121212; /* Deep dark background */
+            color: #e0e0e0; /* Light gray text for readability */
         }
 
         .container {
             max-width: 960px;
             margin: 20px auto;
             padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #1e1e1e; /* Slightly lighter dark for contrast */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Adjusted shadow */
             border-radius: 8px;
         }
 
@@ -27,7 +28,7 @@
             text-align: center;
             margin-bottom: 20px;
             font-size: 2em;
-            color: #007bff;
+            color: #76c7c0; /* Light teal color */
         }
 
         #chart_div {
@@ -39,7 +40,15 @@
             text-align: center;
             margin-top: 20px;
             font-size: 0.9em;
-            color: #666;
+            color: #bdbdbd; /* Light grey color */
+        }
+
+        /* Tooltip Customization */
+        .google-visualization-tooltip {
+            background-color: #2e2e2e !important; /* Dark background */
+            color: #ffffff !important; /* White text */
+            border: 1px solid #555555 !important; /* Subtle border */
+            font-size: 12px !important;
         }
 
         /* Responsive Styles */
@@ -59,6 +68,7 @@
         }
     </style>
     <script type="text/javascript">
+        // Embedded JavaScript
         google.charts.load('current', {'packages':['corechart']});
         google.charts.setOnLoadCallback(drawChart);
 
@@ -86,16 +96,45 @@
 
             const options = {
                 title: 'Daily Activity Breakdown',
-                legend: { position: 'bottom', textStyle: { fontSize: 14 }, alignment: 'center' },
-                tooltip: { isHtml: true, textStyle: { fontSize: 12 } },
-                slices: { 0: { offset: 0.1 }, 16: { textStyle: { color: 'transparent' } } },
-                animation: { startup: true, duration: 1000, easing: 'out' },
-                colors: ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4',                 '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#795548', '#9E9E9E', '#607D8B'],
+                titleTextStyle: { color: '#e0e0e0' },
+                legend: {
+                    position: 'bottom',
+                    textStyle: { fontSize: 14, color: '#e0e0e0' },
+                    alignment: 'center'
+                },
+                tooltip: {
+                    isHtml: true,
+                    textStyle: { fontSize: 12, color: '#ffffff' }, // White text
+                    showColorCode: true
+                },
+                slices: {
+                    0: { offset: 0.1 },
+                    16: { textStyle: { color: 'transparent' } }
+                },
+                animation: {
+                    startup: true,
+                    duration: 1000,
+                    easing: 'out'
+                },
+                colors: [
+                    '#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5',
+                    '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50',
+                    '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800',
+                    '#FF5722', '#795548', '#9E9E9E', '#607D8B'
+                ],
+                backgroundColor: '#1e1e1e',
                 width: '100%',
-                height: 500,  // Initial height
-                chartArea: { left: 20, right: 20, top: 50, bottom: 100 }, // Increased space around the chart
-                responsive: true, // Key for responsiveness
-                pieSliceText: 'none' // Don't show anything inside the slices
+                height: 500,
+                chartArea: {
+                    left: 20,
+                    right: 20,
+                    top: 50,
+                    bottom: 100,
+                    backgroundColor: {
+                        fill: '#1e1e1e'
+                    }
+                },
+                pieSliceText: 'none'
             };
 
             const chart = new google.visualization.PieChart(document.getElementById('chart_div'));
