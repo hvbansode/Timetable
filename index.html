@@ -1,792 +1,555 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Daily Activity Breakdown — accessible, editable, and exportable timetable with an SVG chart." />
-  <title>Daily Activity Breakdown</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="description" content="Daily Activity Breakdown — minimal, accessible, and editable timetable with a clean donut chart."/>
+<title>Daily Activity Breakdown — Minimal</title>
 
-  <style>
-    /* ---------- THEME VARIABLES & ACCESSIBILITY ---------- */
+<!-- Roboto from Google Fonts (Material feel) -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  /* ---------------- Theme & tokens (easy to tweak) ---------------- */
+  :root{
+    --bg: #FAFBFC;
+    --surface: #FFFFFF;
+    --muted: #6B7280;
+    --text: #0F172A;
+    --primary: #1E88E5;   /* Google-like blue */
+    --accent: #00BFA5;    /* calm teal */
+    --elev-1: 0 6px 18px rgba(16,24,40,0.06);
+    --radius: 12px;
+    --container: 980px;
+    --gap: 20px;
+    --chart-size: 420px;
+    --palette: #3F51B5,#2196F3,#03A9F4,#00BCD4,#009688,#4CAF50,#8BC34A,#FFC107,#FF9800,#FF5722,#9C27B0,#E91E63,#607D8B,#795548,#9E9E9E;
+  }
+
+  /* dark-mode toggle respects user preference; app provides a light default (Google favors light) */
+  @media (prefers-color-scheme: dark){
     :root{
-      --bg: #121212;
-      --surface: #1e1e1e;
-      --text: #e0e0e0;
-      --muted-text: #bdbdbd;
-      --primary: #76c7c0;
-      --danger: #ef5350;
-      --card-radius: 12px;
-      --container-max: 1100px;
-      --gap: 16px;
-      --shadow: 0 6px 20px rgba(0,0,0,0.5);
-      --accent-contrast: #000;
-      --chart-size: 420px;
-      --swatch-size: 18px;
-      --font-sans: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-
-      /* default color palette for slices (19 colors) */
-      --colors: #F44336,#E91E63,#9C27B0,#673AB7,#3F51B5,#2196F3,#03A9F4,#00BCD4,#009688,#4CAF50,#8BC34A,#CDDC39,#FFEB3B,#FFC107,#FF9800,#FF5722,#795548,#9E9E9E,#607D8B;
+      --bg: #0B0F13;
+      --surface: #0F1720;
+      --muted: #9CA3AF;
+      --text: #E6EEF6;
+      --elev-1: 0 8px 24px rgba(0,0,0,0.6);
     }
+  }
 
-    /* Light theme override */
-    .theme-light {
-      --bg: #f6f7f9;
-      --surface: #ffffff;
-      --text: #111827;
-      --muted-text: #6b7280;
-      --shadow: 0 6px 18px rgba(16,24,40,0.06);
-      --accent-contrast: #fff;
-    }
+  @media (prefers-reduced-motion: reduce){
+    :root { --reduced-motion: 1; }
+  }
 
-    @media (prefers-color-scheme: light){
-      :root{
-        /* If user prefers light by system we still default to dark unless toggled,
-           but this gives consistent sensible defaults for new users. */
-      }
-    }
+  /* ---------------- Base layout ---------------- */
+  html,body{ height:100%; margin:0; font-family: Roboto, system-ui, -apple-system, "Segoe UI", Arial; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 
-    @media (prefers-reduced-motion: reduce){
-      html[reduce-motion] { --reduced-motion: 1; }
-    }
+  .app{
+    max-width: var(--container);
+    margin: 28px auto;
+    padding: 24px;
+  }
 
-    html,body{
-      height:100%;
-      margin:0;
-      font-family: var(--font-sans);
-      background-color:var(--bg);
-      color:var(--text);
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-    }
+  header.appbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:18px;
+  }
 
-    /* ---------- LAYOUT ---------- */
-    .skip-link{
-      position:absolute;
-      left:-999px;
-      top:auto;
-      width:1px;height:1px;overflow:hidden;
-    }
-    .skip-link:focus{
-      left:1rem;top:1rem;width:auto;height:auto;padding:8px 12px;background:var(--primary);color:var(--accent-contrast);border-radius:6px;z-index:1000;box-shadow:var(--shadow);
-    }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .logo{
+    width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--accent));
+    display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px;box-shadow:var(--elev-1);
+  }
+  h1{ margin:0; font-size:1.15rem; font-weight:500; letter-spacing: -0.01em; }
+  .subtitle{ margin-top:2px; color:var(--muted); font-size:0.92rem; }
 
-    .app {
-      max-width: var(--container-max);
-      margin: 22px auto;
-      padding: 18px;
-    }
+  /* main layout: center stage */
+  main.layout{
+    display:grid;
+    grid-template-columns: 1fr 300px;
+    gap:24px;
+    align-items:start;
+  }
+  @media (max-width:980px){ main.layout{ grid-template-columns: 1fr; } }
 
-    header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:var(--gap);
-      margin-bottom:18px;
-    }
+  /* central card */
+  .card{
+    background:var(--surface);
+    border-radius:var(--radius);
+    padding:20px;
+    box-shadow:var(--elev-1);
+  }
 
-    h1{
-      margin:0;
-      font-size:1.5rem;
-      color:var(--primary);
-      line-height:1.1;
-    }
-    .subtitle{
-      color:var(--muted-text);
-      font-size:0.95rem;
-    }
+  /* minimal chart area (donut) */
+  .chart-area{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+    padding:12px;
+  }
 
-    main {
-      display:grid;
-      grid-template-columns: 1fr 360px;
-      gap:18px;
-    }
-    @media (max-width: 980px){
-      main { grid-template-columns: 1fr; }
-    }
+  /* Donut container */
+  .donut {
+    width: min(100%, var(--chart-size));
+    max-width: var(--chart-size);
+    aspect-ratio: 1 / 1;
+    display:block;
+  }
 
-    .card{
-      background:var(--surface);
-      border-radius:var(--card-radius);
-      padding:18px;
-      box-shadow:var(--shadow);
-    }
+  /* center label */
+  .center-label{
+    position:relative;
+    margin-top: -calc(var(--chart-size) * 0.6);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    pointer-events:none;
+  }
+  .center-box{
+    background:transparent;
+    color:var(--text);
+    text-align:center;
+    pointer-events:none;
+    width:170px;
+  }
+  .center-box .total{ font-size:1.25rem; font-weight:600; }
+  .center-box .muted{ color:var(--muted); font-size:0.92rem; margin-top:6px; }
 
-    /* ---------- CHART & LEGEND ---------- */
-    .chart-wrap{ display:flex;flex-direction:column; gap:12px; align-items:stretch; }
-    figure{ margin:0; }
-    figcaption{ margin-top:8px; color:var(--muted-text); font-size:0.95rem; }
+  /* compact legend on right */
+  .side{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .legend{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    max-height:48vh;
+    overflow:auto;
+    padding:6px;
+  }
+  .legend-item{ display:flex; gap:12px; align-items:center; padding:8px; border-radius:10px; cursor:pointer; }
+  .legend-item:focus, .legend-item[aria-pressed="true"]{ outline:3px solid rgba(30,136,229,0.12); background: rgba(30,136,229,0.03); }
+  .swatch{ width:16px; height:16px; border-radius:4px; flex-shrink:0; }
 
-    .chart-frame{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      min-height: calc(var(--chart-size));
-    }
+  /* FAB: minimal export/settings */
+  .fab{
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    background:var(--primary);
+    color:#fff;
+    width:56px;height:56px;border-radius:14px;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow: 0 10px 30px rgba(16,24,40,0.18);
+    cursor:pointer;
+    border:none;
+    font-size:20px;
+  }
+  .fab:focus{ outline:3px solid rgba(30,136,229,0.18); outline-offset:4px; }
 
-    svg.pie {
-      width:100%;
-      max-width: var(--chart-size);
-      height:auto;
-      max-height: var(--chart-size);
-      transition: transform 350ms ease;
-    }
-    /* avoid animation if reduced-motion */
-    html[reduce-motion] svg.pie { transition-duration: 0ms; }
+  /* minimal sheet slide (for settings / table) */
+  .sheet{
+    position: fixed;
+    right: 22px;
+    bottom: 90px;
+    width: 340px;
+    max-width: calc(100% - 48px);
+    border-radius:12px;
+    background:var(--surface);
+    box-shadow:var(--elev-1);
+    padding:12px;
+    transform: translateY(8px);
+    transition: opacity .22s ease, transform .22s ease;
+    opacity:0;
+    pointer-events:none;
+  }
+  .sheet.open{ opacity:1; pointer-events:auto; transform: translateY(0); }
 
-    .legend { display:flex; flex-direction:column; gap:8px; max-height:55vh; overflow:auto; padding-right:6px; }
-    .legend-item{ display:flex; gap:10px; align-items:center; cursor:pointer; user-select:none; padding:4px; border-radius:8px; }
-    .legend-item:focus, .legend-item[aria-pressed="true"]{ outline:3px solid rgba(118,199,192,0.18); outline-offset:2px; background: rgba(118,199,192,0.03); }
-    .swatch{ width:var(--swatch-size); height:var(--swatch-size); border-radius:4px; flex-shrink:0; border:2px solid rgba(0,0,0,0.12); }
-    .legend-label{ font-size:0.95rem; color:var(--text); }
+  .sheet h4{ margin:0 0 8px 0; font-size:1rem; }
+  .controls-row{ display:flex; gap:8px; align-items:center; margin-bottom:8px; }
+  .btn{ border:0; background:transparent; padding:8px 10px; border-radius:8px; cursor:pointer; color:var(--text); font-weight:500; }
+  .btn.ghost{ border:1px solid rgba(16,24,40,0.06); background:transparent; }
+  .btn.primary{ background:var(--primary); color:white; }
+  .btn:focus{ outline:3px solid rgba(30,136,229,0.12); outline-offset:2px; }
 
-    /* ---------- TABLE ---------- */
-    .data-wrap{ overflow:auto; margin-top:8px; }
-    .data-table{ width:100%; border-collapse:collapse; margin-top:8px; }
-    .data-table th, .data-table td{ padding:8px 10px; text-align:left; font-size:0.95rem; border-bottom:1px solid rgba(255,255,255,0.04); color:var(--text); }
-    .data-table th{ color:var(--muted-text); font-weight:600; font-size:0.85rem; }
-    .row-highlight{ background: rgba(118,199,192,0.06); }
+  /* table (collapsed by default inside sheet, minimal) */
+  table.min-table{ width:100%; border-collapse:collapse; font-size:0.93rem; }
+  table.min-table th, table.min-table td{ padding:8px 6px; text-align:left; color:var(--text); border-bottom:1px solid rgba(16,24,40,0.04); }
+  input.small{ width:72px; padding:6px 8px; border-radius:8px; border:1px solid rgba(16,24,40,0.06); background:transparent; color:var(--text); }
 
-    /* editable fields */
-    .editable{ background:transparent; border:none; color:var(--text); font-size:0.95rem; padding:4px; border-radius:6px; width:100%; }
-    .editable:focus{ outline:3px solid rgba(118,199,192,0.18); outline-offset:2px; background: rgba(118,199,192,0.02); }
+  /* focus visibility improvements */
+  :focus{ scroll-margin-top:120px; }
 
-    /* controls */
-    .controls{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:8px; }
-    .btn{ background:transparent; border:1px solid rgba(255,255,255,0.06); color:var(--text); padding:8px 12px; border-radius:8px; font-size:0.95rem; cursor:pointer; }
-    .btn:focus{ outline:3px solid rgba(118,199,192,0.18); outline-offset:2px; }
-    .btn[aria-pressed="true"]{ background:var(--primary); color:var(--accent-contrast); border-color:transparent; }
+  /* small helper */
+  .muted{ color:var(--muted); font-size:0.92rem; }
+  .hidden{ display:none!important; }
 
-    .small{ font-size:0.85rem; padding:6px 10px; }
-
-    footer{ margin-top:18px; text-align:center; color:var(--muted-text); font-size:0.9rem; }
-
-    /* forced-colors accessibility */
-    @media (forced-colors: active){
-      :root{ --surface:Window; --bg:Window; --text:WindowText; }
-    }
-
-    /* utility */
-    .sr-only{ position:absolute!important; width:1px!important; height:1px!important; padding:0!important; margin:-1px!important; overflow:hidden!important; clip:rect(0,0,0,0)!important; white-space:nowrap!important; border:0!important; }
-
-    /* focus visible improvements */
-    :focus{ scroll-margin-top: 120px; }
-  </style>
+  /* reduce motion */
+  @media (prefers-reduced-motion: reduce){
+    .sheet, .donut, .legend-item, .fab { transition: none !important; }
+  }
+</style>
 </head>
 <body>
-  <a href="#main-content" class="skip-link">Skip to main content</a>
-
   <div class="app" id="app">
-    <header>
-      <div>
-        <h1 id="page-title">Daily Activity Breakdown</h1>
-        <div class="subtitle">Editable, reorderable, exportable — accessible timetable with SVG visualization.</div>
+    <header class="appbar" role="banner">
+      <div class="brand" aria-hidden="false">
+        <div class="logo" aria-hidden="true">DA</div>
+        <div>
+          <h1>Daily Activity</h1>
+          <div class="subtitle">Clean timetable & visualizer — minimal and accessible</div>
+        </div>
       </div>
 
-      <div style="display:flex;gap:8px;align-items:center;">
-        <label for="theme-toggle" class="sr-only">Toggle theme</label>
-        <button id="theme-toggle" class="btn small" aria-pressed="false" title="Toggle light/dark theme">Light theme</button>
-
-        <label for="motion-toggle" class="sr-only">Reduce motion</label>
-        <button id="motion-toggle" class="btn small" aria-pressed="false" title="Toggle reduced motion">Motion</button>
+      <div aria-hidden="false">
+        <!-- small, visible useful action: toggle table (secondary) -->
+        <button id="open-sheet" class="btn ghost" aria-expanded="false" aria-controls="sheet">Table & Export</button>
       </div>
     </header>
 
-    <main id="main-content" tabindex="-1" aria-labelledby="page-title">
-      <!-- CHART & TABLE -->
-      <section class="card chart-wrap" aria-labelledby="chart-heading">
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <h2 id="chart-heading" style="margin:0;font-size:1.1rem;color:var(--text)">Daily Activity — Chart</h2>
-          <div id="chart-live" class="sr-only" aria-live="polite" aria-atomic="true">Chart ready</div>
-        </div>
+    <main class="layout" id="main">
+      <!-- Centered main card: donut + center label -->
+      <section class="card chart-area" aria-labelledby="chart-heading" role="main">
+        <h2 id="chart-heading" style="margin:0;font-weight:500;font-size:1rem">Your day — donut overview</h2>
 
-        <figure style="display:flex;flex-direction:column;align-items:center;">
-          <div class="chart-frame" role="group" aria-labelledby="chart-heading">
-            <!-- Focusable SVG -->
-            <svg id="pie-svg" class="pie" role="img" aria-label="Pie chart showing distribution of daily activities" viewBox="0 0 420 420" tabindex="0"></svg>
-          </div>
-
-          <figcaption>Use the table or legend to navigate. Click a legend item or table row to highlight a slice. Export options available in the side panel.</figcaption>
-        </figure>
-
-        <div class="data-wrap card" style="margin-top:12px; padding:12px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <strong>Data table</strong>
-            <div style="color:var(--muted-text);font-size:0.9rem;">Totals update live and persist to your browser</div>
-          </div>
-
-          <div style="overflow:auto;margin-top:8px;">
-            <table class="data-table" id="data-table" summary="Breakdown of activities and hours.">
-              <thead>
-                <tr>
-                  <th scope="col">Activity</th>
-                  <th scope="col">Time</th>
-                  <th scope="col">Hours</th>
-                  <th scope="col">Share</th>
-                  <th scope="col" aria-hidden="true"></th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Populated by JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- SIDE: legend & controls -->
-      <aside class="side" aria-labelledby="side-heading">
-        <div class="card" aria-hidden="false" style="display:flex;flex-direction:column;gap:12px;">
-          <h3 id="side-heading" style="margin:0;font-size:1rem;color:var(--text)">Legend & Controls</h3>
-
-          <div class="controls" role="toolbar" aria-label="Chart controls">
-            <button id="download-png" class="btn small" title="Export chart as PNG">Export PNG</button>
-            <button id="download-csv" class="btn small" title="Download CSV">Export CSV</button>
-            <button id="reset-defaults" class="btn small" title="Reset to built-in default data">Reset</button>
-          </div>
-
-          <hr style="border:none;height:1px;margin:8px 0;background:rgba(255,255,255,0.03)" />
-
-          <div>
-            <strong style="display:block;margin-bottom:6px">Legend</strong>
-            <div id="legend" class="legend" role="list" aria-label="Chart legend">
-              <!-- Populated by JS -->
+        <!-- SVG donut -->
+        <div aria-hidden="false" style="position:relative;display:flex;align-items:center;justify-content:center;">
+          <svg id="svgDonut" class="donut" viewBox="0 0 420 420" role="img" aria-labelledby="chart-title" tabindex="0"></svg>
+          <!-- center label overlay (minimal) -->
+          <div class="center-label" aria-hidden="false">
+            <div class="center-box" id="centerBox">
+              <div class="total" id="totalHours">0 hrs</div>
+              <div class="muted" id="totalLabel">Total scheduled</div>
             </div>
           </div>
+        </div>
 
-          <div style="font-size:0.9rem;color:var(--muted-text);">
-            <strong>Tip:</strong>
-            <p style="margin:6px 0 0 0">Edit hours directly in the table. Use the up/down arrows in the table to reorder activities. Changes auto-save to your browser.</p>
+        <p class="muted" style="margin-top:8px;">Click any legend item or table row to highlight slices. Edits auto-save to your browser (localStorage).</p>
+      </section>
+
+      <!-- Side: concise legend inside card -->
+      <aside class="side">
+        <div class="card" aria-labelledby="legend-heading">
+          <h3 id="legend-heading" style="margin:0 0 8px 0;font-size:1rem;">Legend</h3>
+          <div id="legend" class="legend" role="list" aria-label="Activities legend">
+            <!-- JS populates legend items -->
+          </div>
+
+          <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+            <button id="exportPNG" class="btn">Export PNG</button>
+            <button id="exportCSV" class="btn">Export CSV</button>
+          </div>
+        </div>
+
+        <div class="card" style="padding:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-weight:600">Quick info</div>
+              <div class="muted">Tip: keep high-priority tasks early in the day.</div>
+            </div>
+            <div style="font-size:0.85rem;color:var(--muted)">Auto-save</div>
           </div>
         </div>
       </aside>
     </main>
 
-    <footer>
-      <div>Made accessible — semantic HTML, keyboard support, color themes, and exports. Data stored locally in your browser.</div>
+    <footer style="margin-top:18px;text-align:center;color:var(--muted);font-size:0.9rem;">
+      Minimal UI • accessible • local-only
     </footer>
   </div>
 
-  <script>
-    /* ---------- Single source of truth for activities ---------- */
-    const DEFAULT_DATA = [
-      { label: 'Morning Routine (5:30-6:00 AM)', hours: 0.5 },
-      { label: 'Meditation (6:00-6:30 AM)', hours: 0.5 },
-      { label: 'Light Exercise (6:30-7:00 AM)', hours: 0.5 },
-      { label: 'Study Session 1 (7:00-8:30 AM)', hours: 1.5 },
-      { label: 'Breakfast & News (8:30-9:00 AM)', hours: 0.5 },
-      { label: 'Study Session 2 (9:00 AM - 12:00 PM)', hours: 3 },
-      { label: 'Short Break (12:00-12:30 PM)', hours: 0.5 },
-      { label: 'Mock Test (12:30-2:30 PM)', hours: 2 },
-      { label: 'Lunch & Relax (2:30-3:30 PM)', hours: 1 },
-      { label: 'Study Session 3 (3:30-5:30 PM)', hours: 2 },
-      { label: 'Break (5:30-6:00 PM)', hours: 0.5 },
-      { label: 'Study Session 4 (6:00-7:30 PM)', hours: 1.5 },
-      { label: 'Dinner & Talk (7:30-8:00 PM)', hours: 0.5 },
-      { label: 'Light Reading (8:00-9:30 PM)', hours: 1.5 },
-      { label: 'Planning (9:30-10:00 PM)', hours: 0.5 },
-      { label: 'Sleep Prep (10:00-10:30 PM)', hours: 0.5 },
-      { label: 'Sleep (10:30 PM - 5:30 AM)', hours: 7 }
-    ];
+  <!-- Floating Action Button opens sheet -->
+  <button id="fab" class="fab" aria-label="Open table and settings">⚙️</button>
 
-    const STORAGE_KEY = 'daily-activity-data-v1';
-    let activities = loadActivities();
+  <!-- Sheet (table + controls) -->
+  <aside id="sheet" class="sheet" role="dialog" aria-modal="false" aria-labelledby="sheetTitle" hidden>
+    <h4 id="sheetTitle">Table & exports</h4>
+    <div class="controls-row" role="toolbar" aria-label="Sheet controls">
+      <button id="addRow" class="btn">Add</button>
+      <button id="reset" class="btn">Reset</button>
+      <div style="flex:1"></div>
+      <button id="closeSheet" class="btn">Close</button>
+    </div>
 
-    // Helpers for theme & motion
-    const appEl = document.getElementById('app');
-    const htmlEl = document.documentElement;
+    <!-- Minimal editable table -->
+    <div style="max-height:50vh; overflow:auto; margin-top:8px;">
+      <table class="min-table" id="editTable" aria-describedby="sheetTitle">
+        <thead><tr><th>Activity</th><th style="width:80px">Hours</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
 
-    function loadActivities(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return JSON.parse(JSON.stringify(DEFAULT_DATA));
-        const parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed) || parsed.length === 0) return JSON.parse(JSON.stringify(DEFAULT_DATA));
-        // normalize numbers
-        parsed.forEach(p => { p.hours = Number(p.hours) || 0; p.label = String(p.label||''); });
-        return parsed;
-      } catch(e) {
-        console.warn('Failed to load activities, using defaults', e);
-        return JSON.parse(JSON.stringify(DEFAULT_DATA));
-      }
+    <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end;">
+      <button id="sheetExportPNG" class="btn ghost">Export PNG</button>
+      <button id="sheetExportCSV" class="btn ghost">Export CSV</button>
+    </div>
+  </aside>
+
+<script>
+/* ---------------- Single source of truth ---------------- */
+const DEFAULT = [
+  { label: 'Morning Routine (5:30-6:00 AM)', hours: 0.5 },
+  { label: 'Meditation (6:00-6:30 AM)', hours: 0.5 },
+  { label: 'Light Exercise (6:30-7:00 AM)', hours: 0.5 },
+  { label: 'Study Session 1 (7:00-8:30 AM)', hours: 1.5 },
+  { label: 'Breakfast & News (8:30-9:00 AM)', hours: 0.5 },
+  { label: 'Study Session 2 (9:00 AM - 12:00 PM)', hours: 3 },
+  { label: 'Short Break (12:00-12:30 PM)', hours: 0.5 },
+  { label: 'Mock Test (12:30-2:30 PM)', hours: 2 },
+  { label: 'Lunch & Relax (2:30-3:30 PM)', hours: 1 },
+  { label: 'Study Session 3 (3:30-5:30 PM)', hours: 2 },
+  { label: 'Break (5:30-6:00 PM)', hours: 0.5 },
+  { label: 'Study Session 4 (6:00-7:30 PM)', hours: 1.5 },
+  { label: 'Dinner & Talk (7:30-8:00 PM)', hours: 0.5 },
+  { label: 'Light Reading (8:00-9:30 PM)', hours: 1.5 },
+  { label: 'Planning (9:30-10:00 PM)', hours: 0.5 },
+  { label: 'Sleep Prep (10:00-10:30 PM)', hours: 0.5 },
+  { label: 'Sleep (10:30 PM - 5:30 AM)', hours: 7 }
+];
+
+const KEY = 'da-minimal-v1';
+let data = load();
+
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(!raw) return structuredClone(DEFAULT);
+    const parsed = JSON.parse(raw);
+    if(!Array.isArray(parsed) || parsed.length===0) return structuredClone(DEFAULT);
+    parsed.forEach(p => { p.hours = Number(p.hours)||0; p.label = String(p.label||''); });
+    return parsed;
+  }catch(e){
+    console.warn('load failed', e);
+    return structuredClone(DEFAULT);
+  }
+}
+
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(data)); announce('Saved locally'); }catch(e){ console.warn('save failed', e); }
+}
+
+/* --------- Utilities: colors, arc math, svg drawing ---------- */
+const svg = document.getElementById('svgDonut');
+const legendEl = document.getElementById('legend');
+const totalHoursEl = document.getElementById('totalHours');
+const centerLabelEl = document.getElementById('totalLabel');
+const palette = getComputedStyle(document.documentElement).getPropertyValue('--palette') || getComputedStyle(document.documentElement).getPropertyValue('--palette');
+const colors = (getComputedStyle(document.documentElement).getPropertyValue('--palette') || getComputedStyle(document.documentElement).getPropertyValue('--palette') || '').split(',').map(s => s.trim()).filter(Boolean);
+function getColor(i){ return colors[i % colors.length] || (['#3F51B5','#2196F3','#00BCD4','#009688','#4CAF50','#FF9800'][i%6]); }
+
+function deg2rad(d){ return d * Math.PI / 180; }
+function polar(cx, cy, r, a){ return { x: cx + r * Math.cos(deg2rad(a-90)), y: cy + r * Math.sin(deg2rad(a-90)) }; }
+
+function arcPath(cx, cy, r, start, end){
+  const p1 = polar(cx,cy,r,start);
+  const p2 = polar(cx,cy,r,end);
+  const large = (end - start) <= 180 ? 0 : 1;
+  return `M ${cx} ${cy} L ${p1.x} ${p1.y} A ${r} ${r} 0 ${large} 0 ${p2.x} ${p2.y} Z`;
+}
+
+/* ---------- render functions ---------- */
+let selected = null;
+
+function render(){
+  renderLegend();
+  renderSvg();
+  renderCenter();
+  renderTableInSheet();
+  save();
+}
+
+function renderCenter(){
+  const total = data.reduce((s,d)=>s+d.hours,0) || 0;
+  const t = Math.round(total * 10)/10;
+  totalHoursEl.textContent = `${t} hrs`;
+  centerLabelEl.textContent = 'Total scheduled';
+}
+
+function renderLegend(){
+  legendEl.innerHTML = '';
+  data.forEach((d,i) => {
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.role = 'button';
+    item.tabIndex = 0;
+    item.dataset.index = i;
+    item.setAttribute('aria-pressed', String(selected===i));
+    const sw = document.createElement('span'); sw.className='swatch'; sw.style.backgroundColor = getColor(i);
+    const txt = document.createElement('div'); txt.style.flex='1'; txt.innerHTML = `<div style="font-weight:600">${escapeHtml(d.label.replace(/\s*\(.*\)$/,''))}</div><div class="muted" style="margin-top:4px">${d.hours} hrs</div>`;
+    item.appendChild(sw); item.appendChild(txt);
+    item.addEventListener('click', ()=> select(i));
+    item.addEventListener('keydown', (e)=> { if(e.key==='Enter'||e.key===' ') { e.preventDefault(); select(i); }});
+    item.addEventListener('mouseenter', ()=> hoverSlice(i));
+    item.addEventListener('mouseleave', ()=> renderSvg());
+    legendEl.appendChild(item);
+  });
+}
+
+/* svg donut drawing */
+function renderSvg(){
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  const size = 420;
+  svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
+  svg.setAttribute('aria-labelledby', 'chart-heading');
+  svg.setAttribute('role','img');
+
+  const cx = size/2, cy = size/2, r = Math.min(cx,cy) - 10;
+  const innerR = r * 0.55;
+
+  const total = data.reduce((s,d)=>s+d.hours,0) || 1;
+  let angle = 0;
+
+  data.forEach((d,i)=>{
+    const sweep = (d.hours/total) * 360;
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    const start = angle, end = angle + sweep;
+    path.setAttribute('d', arcPath(cx,cy,r, start, end));
+    path.setAttribute('fill', getColor(i));
+    path.setAttribute('data-index', i);
+    path.setAttribute('aria-label', `${d.label}, ${d.hours} hours`);
+    path.style.transition = 'transform .28s ease';
+    if (typeof document !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) path.style.transition = 'none';
+
+    // selection visual slight scale
+    if (selected === i){
+      const scale = 1.03;
+      const tx = cx - cx*scale;
+      const ty = cy - cy*scale;
+      path.setAttribute('transform', `scale(${scale}) translate(${tx}, ${ty})`);
+      path.setAttribute('stroke', '#00000020');
+      path.setAttribute('stroke-width', '1.2');
     }
 
-    function saveActivities(){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(activities));
-      announce('Changes saved locally.');
+    path.addEventListener('click', ()=> select(i));
+    path.addEventListener('mouseenter', ()=> hoverLegend(i));
+    svg.appendChild(path);
+
+    // optional small label for big slices
+    if (sweep > 24){
+      const mid = angle + sweep/2;
+      const p = polar(cx,cy, r*0.7, mid);
+      const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+      text.setAttribute('x', p.x);
+      text.setAttribute('y', p.y);
+      text.setAttribute('fill', '#fff');
+      text.setAttribute('font-size','12');
+      text.setAttribute('text-anchor','middle');
+      text.setAttribute('dominant-baseline','central');
+      text.textContent = `${Math.round((d.hours/total)*100)}%`;
+      svg.appendChild(text);
     }
 
-    function resetToDefaults(){
-      activities = JSON.parse(JSON.stringify(DEFAULT_DATA));
-      saveActivities();
-      renderAll();
-      announce('Reset to default schedule.');
-    }
+    angle += sweep;
+  });
 
-    // Utility: announce to ARIA live region
-    function announce(text){
-      const live = document.getElementById('chart-live');
-      live.textContent = text;
-    }
+  // inner circle to create donut
+  const inner = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  inner.setAttribute('cx', cx); inner.setAttribute('cy', cy); inner.setAttribute('r', innerR);
+  inner.setAttribute('fill', getComputedStyle(document.documentElement).getPropertyValue('--surface').trim() || '#fff');
+  svg.appendChild(inner);
 
-    // ---------- Chart drawing (accessible SVG pie) ----------
-    const svg = document.getElementById('pie-svg');
+  // keyboard navigation: left/right cycles selection
+  svg.onkeydown = (e)=>{
+    if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key)) return;
+    e.preventDefault();
+    const n = data.length;
+    let idx = selected === null ? 0 : selected;
+    if (e.key === 'ArrowLeft' || e.key==='ArrowUp') idx = (idx - 1 + n) % n;
+    if (e.key === 'ArrowRight' || e.key==='ArrowDown') idx = (idx + 1) % n;
+    if (e.key === 'Home') idx = 0;
+    if (e.key === 'End') idx = n -1;
+    select(idx);
+  };
+  svg.tabIndex = 0;
+}
 
-    function polarToCartesian(cx, cy, r, angleDeg){
-      const angleRad = (angleDeg-90) * Math.PI/180.0;
-      return { x: cx + (r * Math.cos(angleRad)), y: cy + (r * Math.sin(angleRad)) };
-    }
+/* hover/interaction helpers */
+function select(i){
+  selected = i;
+  render(); announce(`${data[i].label}, ${data[i].hours} hours selected.`);
+}
 
-    function describeArc(cx, cy, r, startAngle, endAngle){
-      const start = polarToCartesian(cx, cy, r, endAngle);
-      const end = polarToCartesian(cx, cy, r, startAngle);
-      const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
-      const d = [
-        `M ${cx} ${cy}`,
-        `L ${start.x} ${start.y}`,
-        `A ${r} ${r} 0 ${largeArcFlag} 0 ${end.x} ${end.y}`,
-        'Z'
-      ].join(' ');
-      return d;
-    }
+function hoverSlice(i){ selected = i; renderSvg(); }
+function hoverLegend(i){ /* keep shallow: temporary highlight */ renderSvg(); }
 
-    function getColorPalette(){
-      const css = getComputedStyle(document.documentElement).getPropertyValue('--colors') || '';
-      return css.split(',').map(s => s.trim()).filter(Boolean);
-    }
+/* ---------- sheet (table) rendering & editing ---------- */
+const sheet = document.getElementById('sheet');
+const sheetBody = document.querySelector('#editTable tbody');
+const openSheetBtn = document.getElementById('open-sheet');
+const fab = document.getElementById('fab');
 
-    function drawChart(selectedIndex = null){
-      // clear svg
-      while(svg.firstChild) svg.removeChild(svg.firstChild);
-
-      const size = 420;
-      const cx = size/2;
-      const cy = size/2;
-      const r = Math.min(cx,cy) - 10;
-
-      svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
-      svg.setAttribute('width', '100%');
-      svg.setAttribute('height', '100%');
-      svg.setAttribute('role','img');
-
-      const total = activities.reduce((s,a)=>s+a.hours,0) || 1;
-      let angleStart = 0;
-      const colors = getColorPalette();
-      const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
-
-      // Add title for screen readers
-      const title = document.createElementNS('http://www.w3.org/2000/svg','title');
-      title.textContent = 'Pie chart of daily activities';
-      svg.appendChild(title);
-
-      activities.forEach((act, i) => {
-        const portion = (act.hours/total) * 360;
-        const angleEnd = angleStart + portion;
-        const d = describeArc(cx,cy,r, angleStart, angleEnd);
-        const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-        path.setAttribute('d', d);
-        path.setAttribute('data-index', i);
-        const color = colors[i % colors.length] || '#888';
-        path.setAttribute('fill', color);
-        path.setAttribute('stroke', getComputedStyle(document.documentElement).getPropertyValue('--surface') || '#000');
-        path.setAttribute('stroke-width', '0.5');
-
-        // accessibility attributes
-        const pct = Math.round((act.hours/total)*1000)/10;
-        path.setAttribute('role','img');
-        path.setAttribute('tabindex','-1');
-        path.setAttribute('aria-label', `${act.label}: ${act.hours} hours, ${pct}%`);
-
-        // mouse/keyboard interactivity
-        path.addEventListener('click', () => selectSlice(i));
-        path.addEventListener('mouseenter', () => highlightLegend(i));
-        path.addEventListener('mouseleave', () => clearLegendHighlight(i));
-
-        // keyboard: allow Enter/Space when focused via external control (SVG itself handles arrow navigation)
-        svg.appendChild(path);
-
-        // If selected, apply slight scale transform by cloning with transform-group
-        if (i === selectedIndex) {
-          path.setAttribute('transform', `scale(1.03) translate(${(cx - cx*1.03).toFixed(2)}, ${(cy - cy*1.03).toFixed(2)})`);
-          path.setAttribute('stroke-width', '1.5');
-        }
-
-        // attach a small label near centroid for large slices (optional)
-        if (portion > 20) {
-          const midAngle = angleStart + portion/2;
-          const labelPos = polarToCartesian(cx, cy, r*0.65, midAngle);
-          const text = document.createElementNS('http://www.w3.org/2000/svg','text');
-          text.setAttribute('x', labelPos.x);
-          text.setAttribute('y', labelPos.y);
-          text.setAttribute('font-size','10');
-          text.setAttribute('fill', '#fff');
-          text.setAttribute('text-anchor','middle');
-          text.setAttribute('dominant-baseline','central');
-          text.textContent = `${Math.round(pct)}%`;
-          svg.appendChild(text);
-        }
-
-        angleStart = angleEnd;
-      });
-
-      // center circle for aesthetics
-      const center = document.createElementNS('http://www.w3.org/2000/svg','circle');
-      center.setAttribute('cx', cx);
-      center.setAttribute('cy', cy);
-      center.setAttribute('r', Math.max(60, r*0.35));
-      center.setAttribute('fill', getComputedStyle(document.documentElement).getPropertyValue('--surface').trim() || '#222');
-      center.setAttribute('pointer-events','none');
-      svg.appendChild(center);
-
-      // keyboard navigation on SVG: Arrow keys cycle slices
-      svg.removeEventListener('keydown', svg._kbd); // remove if present
-      svg._kbd = (e) => {
-        const n = activities.length;
-        if (!['ArrowLeft','ArrowUp','ArrowRight','ArrowDown','Home','End'].includes(e.key)) return;
-        e.preventDefault();
-        let current = selectedSliceIndex !== null ? selectedSliceIndex : 0;
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') current = (current - 1 + n) % n;
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') current = (current + 1) % n;
-        if (e.key === 'Home') current = 0;
-        if (e.key === 'End') current = n-1;
-        selectSlice(current);
-      };
-      svg.addEventListener('keydown', svg._kbd);
-      svg.setAttribute('tabindex','0'); // allow focus
-    }
-
-    // selected slice tracking
-    let selectedSliceIndex = null;
-
-    // ---------- Legend & table rendering ----------
-    function populateLegend(){
-      const legend = document.getElementById('legend');
-      legend.innerHTML = '';
-      const colors = getColorPalette();
-      activities.forEach((a,i) => {
-        const item = document.createElement('div');
-        item.className = 'legend-item';
-        item.role = 'button';
-        item.tabIndex = 0;
-        item.setAttribute('aria-pressed', 'false');
-        item.dataset.index = i;
-
-        const sw = document.createElement('span');
-        sw.className = 'swatch';
-        sw.style.backgroundColor = colors[i % colors.length] || '#888';
-
-        const lab = document.createElement('div');
-        lab.className = 'legend-label';
-        lab.textContent = a.label;
-
-        item.appendChild(sw);
-        item.appendChild(lab);
-
-        item.addEventListener('click', () => selectSlice(i));
-        item.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); selectSlice(i); }
-        });
-        item.addEventListener('mouseenter', () => highlightSliceVisual(i));
-        item.addEventListener('mouseleave', () => drawChart(selectedSliceIndex));
-
-        legend.appendChild(item);
-      });
-    }
-
-    function populateTable(){
-      const tbody = document.querySelector('#data-table tbody');
-      tbody.innerHTML = '';
-      const total = activities.reduce((s,a)=>s+a.hours,0) || 1;
-      activities.forEach((a,i) => {
-        const tr = document.createElement('tr');
-        tr.id = 'row-' + i;
-
-        // Activity editable cell
-        const tdLabel = document.createElement('td');
-        const inputLabel = document.createElement('input');
-        inputLabel.className = 'editable';
-        inputLabel.value = a.label;
-        inputLabel.setAttribute('aria-label', `Activity label ${i+1}`);
-        inputLabel.addEventListener('change', (e) => {
-          activities[i].label = e.target.value.trim() || 'Untitled';
-          saveActivities();
-          renderAll();
-        });
-        tdLabel.appendChild(inputLabel);
-        tr.appendChild(tdLabel);
-
-        // Time extraction (if parentheses exist)
-        const tdTime = document.createElement('td');
-        const timeText = a.label.match(/\(([^)]+)\)$/)?.[1] ?? '';
-        tdTime.textContent = timeText;
-        tr.appendChild(tdTime);
-
-        // Hours editable
-        const tdHours = document.createElement('td');
-        const inputHours = document.createElement('input');
-        inputHours.className = 'editable';
-        inputHours.type = 'number';
-        inputHours.step = '0.25';
-        inputHours.min = '0';
-        inputHours.value = a.hours;
-        inputHours.setAttribute('aria-label', `Hours for ${a.label}`);
-        inputHours.addEventListener('change', (e) => {
-          let v = Number(e.target.value);
-          if (Number.isNaN(v) || v < 0) v = 0;
-          activities[i].hours = v;
-          saveActivities();
-          renderAll();
-        });
-        // Keyboard: arrow up/down increment/decrement
-        inputHours.addEventListener('keydown', (e) => {
-          if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-            e.preventDefault();
-            const delta = e.key === 'ArrowUp' ? 0.25 : -0.25;
-            let v = Math.round((Number(inputHours.value || 0) + delta) * 100)/100;
-            if (v < 0) v = 0;
-            inputHours.value = v;
-            activities[i].hours = v;
-            saveActivities();
-            renderAll();
-          }
-        });
-        tdHours.appendChild(inputHours);
-        tr.appendChild(tdHours);
-
-        // Share %
-        const tdShare = document.createElement('td');
-        const pct = Math.round((a.hours/total)*1000)/10;
-        tdShare.textContent = pct + '%';
-        tr.appendChild(tdShare);
-
-        // Reorder buttons (Up/Down)
-        const tdCtrl = document.createElement('td');
-        tdCtrl.style.whiteSpace = 'nowrap';
-        const upBtn = document.createElement('button');
-        upBtn.className = 'btn small';
-        upBtn.textContent = '↑';
-        upBtn.title = 'Move up';
-        upBtn.addEventListener('click', () => moveItem(i, -1));
-        const downBtn = document.createElement('button');
-        downBtn.className = 'btn small';
-        downBtn.textContent = '↓';
-        downBtn.title = 'Move down';
-        downBtn.addEventListener('click', () => moveItem(i, +1));
-
-        const delBtn = document.createElement('button');
-        delBtn.className = 'btn small';
-        delBtn.style.marginLeft = '8px';
-        delBtn.textContent = 'Delete';
-        delBtn.title = 'Remove activity';
-        delBtn.addEventListener('click', () => {
-          if (confirm('Remove this activity?')) { activities.splice(i,1); saveActivities(); renderAll(); }
-        });
-
-        tdCtrl.appendChild(upBtn);
-        tdCtrl.appendChild(downBtn);
-        tdCtrl.appendChild(delBtn);
-        tr.appendChild(tdCtrl);
-
-        // row click -> select slice
-        tr.addEventListener('click', () => selectSlice(i));
-        tbody.appendChild(tr);
-      });
-    }
-
-    // move item by delta (-1 or +1)
-    function moveItem(index, delta){
-      const newIndex = index + delta;
-      if (newIndex < 0 || newIndex >= activities.length) return;
-      const [item] = activities.splice(index, 1);
-      activities.splice(newIndex, 0, item);
-      saveActivities();
-      renderAll();
-      // focus moved row
-      setTimeout(()=> document.getElementById('row-' + newIndex)?.querySelector('.editable')?.focus(), 50);
-    }
-
-    // ---------- Selection & highlighting ----------
-    function selectSlice(index){
-      selectedSliceIndex = index;
-      highlightLegend(index);
-      highlightTableRow(index);
-      drawChart(index);
-      announce(`${activities[index].label}, ${activities[index].hours} hours selected.`);
-    }
-
-    function highlightLegend(index){
-      const legendItems = document.querySelectorAll('#legend .legend-item');
-      legendItems.forEach(li => {
-        li.setAttribute('aria-pressed', String(li.dataset.index == index));
-        if (Number(li.dataset.index) === Number(index)) li.classList.add('active');
-        else li.classList.remove('active');
-      });
-    }
-
-    function clearLegendHighlight(){
-      const legendItems = document.querySelectorAll('#legend .legend-item');
-      legendItems.forEach(li => li.setAttribute('aria-pressed','false'));
-    }
-
-    function highlightSliceVisual(index){
-      // draw with that slice selected
-      drawChart(index);
-    }
-
-    function highlightTableRow(index){
-      document.querySelectorAll('#data-table tbody tr').forEach((tr, i) => {
-        if (i === index) tr.classList.add('row-highlight');
-        else tr.classList.remove('row-highlight');
-      });
-      // ensure the selected row is visible
-      const row = document.getElementById('row-' + index);
-      if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-
-    // ---------- Export functions ----------
-    function downloadCSV(){
-      const header = ['Activity','Time','Hours'];
-      const rows = activities.map(a => {
-        const time = a.label.match(/\(([^)]+)\)$/)?.[1] ?? '';
-        return [a.label.replace(/\(([^)]*)\)$/,'').trim(), time, a.hours];
-      });
-      const csv = [header, ...rows].map(r=> r.map(field => `"${String(field).replace(/"/g,'""')}"`).join(',')).join('\n');
-      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'daily-activity-breakdown.csv';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      announce('CSV exported.');
-    }
-
-    function downloadPNG(){
-      // render SVG to canvas and trigger PNG download
-      const svgEl = document.getElementById('pie-svg');
-      const serializer = new XMLSerializer();
-      const svgString = serializer.serializeToString(svgEl);
-      const blob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
-      const url = URL.createObjectURL(blob);
-      const img = new Image();
-      img.onload = function(){
-        const canvas = document.createElement('canvas');
-        const scale = 2; // higher quality
-        canvas.width = svgEl.viewBox.baseVal.width * scale;
-        canvas.height = svgEl.viewBox.baseVal.height * scale;
-        const ctx = canvas.getContext('2d');
-        // optional: fill background to match theme
-        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim() || '#fff';
-        ctx.fillRect(0,0,canvas.width,canvas.height);
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        canvas.toBlob((blob) => {
-          const link = document.createElement('a');
-          link.href = URL.createObjectURL(blob);
-          link.download = 'daily-activity-chart.png';
-          document.body.appendChild(link);
-          link.click();
-          link.remove();
-          URL.revokeObjectURL(link.href);
-          URL.revokeObjectURL(url);
-          announce('PNG exported.');
-        }, 'image/png');
-      };
-      img.onerror = function(){
-        URL.revokeObjectURL(url);
-        announce('Export failed.');
-        alert('Export failed — your browser may block SVG to Canvas conversion for local files. Try serving the file over HTTP.');
-      };
-      img.src = url;
-    }
-
-    // ---------- UI wiring ----------
-    function renderAll(){
-      populateLegend();
-      populateTable();
-      drawChart(selectedSliceIndex);
-    }
-
-    // Setup event handlers
-    document.getElementById('download-csv').addEventListener('click', downloadCSV);
-    document.getElementById('download-png').addEventListener('click', downloadPNG);
-    document.getElementById('reset-defaults').addEventListener('click', () => {
-      if (confirm('Reset schedule to the built-in defaults? This will overwrite your local changes.')) resetToDefaults();
+function renderTableInSheet(){
+  sheetBody.innerHTML = '';
+  data.forEach((d,i) => {
+    const tr = document.createElement('tr');
+    // label
+    const tdLabel = document.createElement('td');
+    const inLabel = document.createElement('input');
+    inLabel.value = d.label;
+    inLabel.className = 'small';
+    inLabel.addEventListener('change', (e)=>{
+      data[i].label = e.target.value || 'Untitled';
+      save(); render();
     });
+    tdLabel.appendChild(inLabel);
+    tr.appendChild(tdLabel);
 
-    // Theme toggle
-    const themeToggle = document.getElementById('theme-toggle');
-    themeToggle.addEventListener('click', () => {
-      const light = appEl.classList.toggle('theme-light');
-      themeToggle.setAttribute('aria-pressed', String(light));
-      themeToggle.textContent = light ? 'Dark theme' : 'Light theme';
-      announce(light ? 'Light theme enabled.' : 'Dark theme enabled.');
-      // Save preference
-      try { localStorage.setItem('daily-activity-theme', light ? 'light' : 'dark'); } catch(e){}
+    // hours
+    const tdHours = document.createElement('td');
+    const inH = document.createElement('input');
+    inH.type = 'number';
+    inH.step = '0.25';
+    inH.min = '0';
+    inH.value = d.hours;
+    inH.className = 'small';
+    inH.addEventListener('change', (e)=>{
+      let v = Number(e.target.value); if(Number.isNaN(v) || v < 0) v = 0;
+      data[i].hours = v; save(); render();
     });
+    tdHours.appendChild(inH);
+    tr.appendChild(tdHours);
 
-    // Motion toggle
-    const motionToggle = document.getElementById('motion-toggle');
-    motionToggle.addEventListener('click', () => {
-      const reduced = htmlEl.hasAttribute('reduce-motion');
-      if (reduced) {
-        htmlEl.removeAttribute('reduce-motion');
-        motionToggle.setAttribute('aria-pressed','false');
-        motionToggle.textContent = 'Motion';
-        announce('Motion enabled.');
-        try { localStorage.removeItem('daily-activity-motion'); } catch(e){}
-      } else {
-        htmlEl.setAttribute('reduce-motion','');
-        motionToggle.setAttribute('aria-pressed','true');
-        motionToggle.textContent = 'Reduced motion';
-        announce('Reduced motion enabled.');
-        try { localStorage.setItem('daily-activity-motion','reduce'); } catch(e){}
-      }
-    });
+    // actions: up/down/delete
+    const tdAct = document.createElement('td');
+    tdAct.style.textAlign = 'right';
+    const up = document.createElement('button'); up.className='btn'; up.textContent='↑'; up.title='Move up';
+    up.addEventListener('click', ()=> move(i, -1));
+    const down = document.createElement('button'); down.className='btn'; down.textContent='↓'; down.title='Move down';
+    down.addEventListener('click', ()=> move(i, +1));
+    const del = document.createElement('button'); del.className='btn'; del.textContent='Delete'; del.title='Remove';
+    del.addEventListener('click', ()=> { if(confirm('Remove this activity?')) { data.splice(i,1); save(); render(); }});
+    tdAct.appendChild(up); tdAct.appendChild(down); tdAct.appendChild(del);
+    tr.appendChild(tdAct);
 
-    // load theme & motion from localStorage
-    (function initPreferences(){
-      try {
-        const theme = localStorage.getItem('daily-activity-theme');
-        if (theme === 'light') {
-          appEl.classList.add('theme-light');
-          themeToggle.setAttribute('aria-pressed','true');
-          themeToggle.textContent = 'Dark theme';
-        } else {
-          themeToggle.setAttribute('aria-pressed','false');
-          themeToggle.textContent = 'Light theme';
-        }
-        const motion = localStorage.getItem('daily-activity-motion');
-        if (motion === 'reduce'){
-          htmlEl.setAttribute('reduce-motion','');
-          motionToggle.setAttribute('aria-pressed','true');
-          motionToggle.textContent = 'Reduced motion';
-        } else {
-          motionToggle.setAttribute('aria-pressed','false');
-          motionToggle.textContent = 'Motion';
-        }
-      } catch(e){}
-    })();
+    tr.addEventListener('click', ()=> select(i));
+    sheetBody.appendChild(tr);
+  });
+}
 
-    // Keyboard: focus styling and accessible hints
-    document.addEventListener('keydown', (e) => {
-      // Press "?" to show quick help (optional)
-      if (e.key === '?') {
-        alert('Keyboard tips:\n- Focus the chart (tab) then use Arrow keys to move between slices.\n- In the table, edit Hours and press ArrowUp/Down to step values.\n- Use the legend or table rows to select slices.');
-      }
-    });
+/* move item */
+function move(index, delta){
+  const to = index + delta;
+  if (to < 0 || to >= data.length) return;
+  const [it] = data.splice(index,1);
+  data.splice(to,0,it);
+  save(); render();
+}
 
-    // initial render
-    renderAll();
-    announce('Chart initialized.');
+/* add row */
+document.getElementById('addRow').addEventListener('click', ()=>{
+  data.push({ label: 'New Activity', hours: 0.5 });
+  save(); render();
+});
 
-    // expose some helpers for debugging (optional)
-    window.__dailyActivity = {
-      get: () => activities,
-      set: (newData) => { activities = newData; saveActivities(); renderAll(); },
-      reset: resetToDefaults
-    };
-
-  </script>
-</body>
-</html>
+/* reset */
+document.getElementById('reset').add
