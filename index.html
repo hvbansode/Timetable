@@ -1,153 +1,564 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta description content="Daily Activity Breakdown chart showing how time is spent throughout the day">
-    <title>Daily Activity Breakdown</title>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <style>
-        /* Embedded CSS */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background-color: #121212; /* Deep dark background */
-            color: #e0e0e0; /* Light gray text for readability */
-        }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Daily Activity Breakdown — an accessible, responsive chart and data table showing how you spend time during the day." />
+  <title>Daily Activity Breakdown</title>
 
-        .container {
-            max-width: 960px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #1e1e1e; /* Slightly lighter dark for contrast */
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Adjusted shadow */
-            border-radius: 8px;
-        }
+  <!-- Google Charts -->
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
 
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 2em;
-            color: #76c7c0; /* Light teal color */
-        }
+  <style>
+    /*
+      Refined styling:
+      - CSS variables for easy theming
+      - Respect prefers-color-scheme and prefers-reduced-motion
+      - Clear focus outlines, skip link
+      - Maintain WCAG contrast
+    */
 
-        #chart_div {
-            width: 100%;
-            height: 500px; /* Initial height */
-        }
+    :root{
+      --bg: #121212;
+      --surface: #1e1e1e;
+      --muted-text: #bdbdbd;
+      --text: #e0e0e0;
+      --primary: #76c7c0; /* accent */
+      --card-radius: 12px;
+      --container-max: 960px;
+      --gap: 16px;
+      --shadow: 0 6px 20px rgba(0,0,0,0.5);
+      /* color palette for pie — ensure varied hues and contrast */
+      --colors: #F44336,#E91E63,#9C27B0,#673AB7,#3F51B5,#2196F3,#03A9F4,#00BCD4,#009688,#4CAF50,#8BC34A,#CDDC39,#FFEB3B,#FFC107,#FF9800,#FF5722,#795548,#9E9E9E,#607D8B;
+    }
 
-        footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 0.9em;
-            color: #bdbdbd; /* Light grey color */
-        }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg: #f6f7f9;
+        --surface: #ffffff;
+        --text: #111827;
+        --muted-text: #6b7280;
+        --shadow: 0 6px 18px rgba(16,24,40,0.06);
+      }
+      /* keep --primary same or change to suit */
+    }
 
-        /* Tooltip Customization */
-        .google-visualization-tooltip {
-            background-color: #2e2e2e !important; /* Dark background */
-            color: #ffffff !important; /* White text */
-            border: 1px solid #555555 !important; /* Subtle border */
-            font-size: 12px !important;
-        }
+    @media (prefers-reduced-motion: reduce){
+      :root{ --reduced-motion: 1; }
+    }
 
-        /* Responsive Styles */
-        @media (max-width: 992px) {
-            #chart_div { height: 400px; }
-            h1 { font-size: 1.7em; }
-        }
+    html,body{
+      height:100%;
+      margin:0;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background-color:var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
 
-        @media (max-width: 768px) {
-            #chart_div { height: 350px; }
-            h1 { font-size: 1.5em; }
-        }
+    /* Skip link for keyboard users */
+    .skip-link{
+      position: absolute;
+      left: -999px;
+      top: auto;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+    .skip-link:focus{
+      left: 1rem;
+      top: 1rem;
+      width: auto;
+      height: auto;
+      padding: 8px 12px;
+      background:var(--primary);
+      color: #000;
+      border-radius:6px;
+      z-index:1000;
+      box-shadow: var(--shadow);
+    }
 
-        @media (max-width: 576px) {
-            #chart_div { height: 300px; }
-            h1 { font-size: 1.2em; }
-        }
-    </style>
-    <script type="text/javascript">
-        // Embedded JavaScript
-        google.charts.load('current', {'packages':['corechart']});
-        google.charts.setOnLoadCallback(drawChart);
+    .app {
+      max-width: var(--container-max);
+      margin: 20px auto;
+      padding: 20px;
+    }
 
-        function drawChart() {
-            const data = google.visualization.arrayToDataTable([
-                ['Activity', 'Hours'],
-                ['Morning Routine (5:30-6:00 AM)', 0.5],
-                ['Meditation (6:00-6:30 AM)', 0.5],
-                ['Light Exercise (6:30-7:00 AM)', 0.5],
-                ['Study Session 1 (7:00-8:30 AM)', 1.5],
-                ['Breakfast & News (8:30-9:00 AM)', 0.5],
-                ['Study Session 2 (9:00 AM - 12:00 PM)', 3],
-                ['Short Break (12:00-12:30 PM)', 0.5],
-                ['Mock Test (12:30-2:30 PM)', 2],
-                ['Lunch & Relax (2:30-3:30 PM)', 1],
-                ['Study Session 3 (3:30-5:30 PM)', 2],
-                ['Break (5:30-6:00 PM)', 0.5],
-                ['Study Session 4 (6:00-7:30 PM)', 1.5],
-                ['Dinner & Talk (7:30-8:00 PM)', 0.5],
-                ['Light Reading (8:00-9:30 PM)', 1.5],
-                ['Planning (9:30-10:00 PM)', 0.5],
-                ['Sleep Prep (10:00-10:30 PM)', 0.5],
-                ['Sleep (10:30 PM - 5:30 AM)', 7]
-            ]);
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:var(--gap);
+      margin-bottom:16px;
+    }
 
-            const options = {
-                title: 'Daily Activity Breakdown',
-                titleTextStyle: { color: '#e0e0e0' },
-                legend: {
-                    position: 'bottom',
-                    textStyle: { fontSize: 14, color: '#e0e0e0' },
-                    alignment: 'center'
-                },
-                tooltip: {
-                    isHtml: true,
-                    textStyle: { fontSize: 12, color: '#ffffff' }, // White text
-                    showColorCode: true
-                },
-                slices: {
-                    0: { offset: 0.1 },
-                    16: { textStyle: { color: 'transparent' } }
-                },
-                animation: {
-                    startup: true,
-                    duration: 1000,
-                    easing: 'out'
-                },
-                colors: [
-                    '#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5',
-                    '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50',
-                    '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800',
-                    '#FF5722', '#795548', '#9E9E9E', '#607D8B'
-                ],
-                backgroundColor: '#1e1e1e',
-                width: '100%',
-                height: 500,
-                chartArea: {
-                    left: 20,
-                    right: 20,
-                    top: 50,
-                    bottom: 100,
-                    backgroundColor: {
-                        fill: '#1e1e1e'
-                    }
-                },
-                pieSliceText: 'none'
-            };
+    h1{
+      margin:0;
+      font-size:1.5rem;
+      color:var(--primary);
+      line-height:1.1;
+    }
 
-            const chart = new google.visualization.PieChart(document.getElementById('chart_div'));
-            chart.draw(data, options);
+    .card{
+      background:var(--surface);
+      border-radius:var(--card-radius);
+      padding:18px;
+      box-shadow: var(--shadow);
+    }
 
-            window.addEventListener('resize', () => chart.draw(data, options));
-        }
-    </script>
+    main {
+      display:grid;
+      grid-template-columns: 1fr 320px;
+      gap:18px;
+    }
+
+    /* On narrow screens stack */
+    @media (max-width: 880px){
+      main { grid-template-columns: 1fr; }
+    }
+
+    /* Chart container */
+    .chart-wrap{
+      min-height: 320px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    /* Chart figure and caption for semantic accessibility */
+    figure{
+      margin:0;
+    }
+    figcaption{
+      margin-top:8px;
+      color:var(--muted-text);
+      font-size:0.95rem;
+    }
+
+    /* Accessible table: good spacing and readable font size */
+    .data-table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:12px;
+    }
+    .data-table th, .data-table td{
+      padding:8px 10px;
+      text-align:left;
+      font-size:0.95rem;
+      border-bottom:1px solid rgba(255,255,255,0.04);
+      color:var(--text);
+    }
+    .data-table th{ color:var(--muted-text); font-weight:600; font-size:0.85rem; }
+
+    /* Side panel (legend & controls) */
+    .side{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .legend{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      max-height:60vh;
+      overflow:auto;
+      padding-right:6px;
+    }
+    .legend-item{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      cursor:default;
+      user-select:none;
+    }
+    .swatch{
+      width:18px;
+      height:18px;
+      border-radius:4px;
+      flex-shrink:0;
+      border:2px solid rgba(0,0,0,0.12);
+    }
+    .legend-label{ font-size:0.95rem; color:var(--text); }
+
+    /* Controls */
+    .controls{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .btn{
+      background:transparent;
+      border:1px solid rgba(255,255,255,0.08);
+      color:var(--text);
+      padding:8px 12px;
+      border-radius:8px;
+      font-size:0.95rem;
+      cursor:pointer;
+    }
+    .btn:focus{ outline:3px solid rgba(118,199,192,0.24); outline-offset:2px; }
+    .btn[aria-pressed="true"]{
+      background:var(--primary);
+      color:#000;
+      border-color:transparent;
+    }
+
+    /* Focus style for interactive chart wrapper */
+    .chart-frame:focus{
+      outline:3px solid rgba(118,199,192,0.24);
+      outline-offset:6px;
+    }
+
+    footer{ margin-top:16px; text-align:center; color:var(--muted-text); font-size:0.9rem; }
+
+    /* High contrast aid for users who need it */
+    @media (forced-colors: active){
+      :root{
+        --surface: Window;
+        --bg: Window;
+        --text: WindowText;
+      }
+    }
+
+    /* Utility: hide visually but keep accessible */
+    .sr-only{
+      position:absolute!important;
+      width:1px!important;
+      height:1px!important;
+      padding:0!important;
+      margin:-1px!important;
+      overflow:hidden!important;
+      clip:rect(0,0,0,0)!important;
+      white-space:nowrap!important;
+      border:0!important;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Daily Activity Breakdown</h1>
-        <div id="chart_div" aria-label="Chart showing daily activity breakdown"></div>
-    </div>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <div class="app">
+    <header>
+      <h1 id="page-title">Daily Activity Breakdown</h1>
+      <div aria-hidden="true" style="font-size:0.9rem;color:var(--muted-text);">Visual + accessible data table</div>
+    </header>
+
+    <main id="main-content" tabindex="-1" aria-labelledby="page-title">
+      <!-- Primary visual -->
+      <section class="card chart-wrap" aria-labelledby="chart-heading">
+        <figure>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <h2 id="chart-heading" style="margin:0;font-size:1.1rem;color:var(--text)">Daily Activity — Chart</h2>
+            <!-- Live region to announce when chart is updated -->
+            <div id="chart-live" class="sr-only" aria-live="polite" aria-atomic="true">Chart initialized</div>
+          </div>
+
+          <!-- Chart container is focusable so keyboard users can land on it -->
+          <div id="chart_div" class="chart-frame" role="img"
+               aria-label="Pie chart showing time spent in different daily activities. Use the table or legend to navigate the data."
+               tabindex="0"></div>
+
+          <figcaption>
+            Below the chart is a data table presenting the same information in a readable, keyboard-accessible format (WCAG-friendly).
+          </figcaption>
+        </figure>
+
+        <!-- Accessible data table duplicate of chart data -->
+        <div style="overflow:auto;">
+          <table class="data-table" id="data_table" summary="Breakdown of activities and hours.">
+            <thead>
+              <tr>
+                <th scope="col">Activity</th>
+                <th scope="col">Time</th>
+                <th scope="col">Hours</th>
+                <th scope="col">Share</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Rows populated by JS for consistency with chart data -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Side panel: legend + controls -->
+      <aside class="side" aria-labelledby="side-heading">
+        <div class="card" aria-hidden="false">
+          <h3 id="side-heading" style="margin-top:0;font-size:1rem;color:var(--text)">Legend & Controls</h3>
+
+          <div class="controls" role="toolbar" aria-label="Chart controls">
+            <button class="btn" id="toggle-data-table" aria-pressed="false">Toggle data table</button>
+            <button class="btn" id="reduce-motion" aria-pressed="false">Reduce motion</button>
+            <button class="btn" id="download-csv" type="button">Download CSV</button>
+          </div>
+
+          <hr style="border:none;height:1px;margin:12px 0;background:rgba(255,255,255,0.03)" />
+
+          <div class="legend" id="legend" aria-label="Chart legend — lists activities and colors">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <div class="card" style="font-size:0.95rem;color:var(--muted-text);">
+          <strong>Tip:</strong>
+          <p style="margin:8px 0 0 0">Use the table for screen readers, or click a legend item to highlight the corresponding slice in the chart.</p>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <div>Made accessible — follows WCAG-friendly patterns (semantic HTML, keyboard support, high contrast options)</div>
+    </footer>
+  </div>
+
+  <script>
+    /*
+     * Data model: keep a single source of truth and derive chart + table from it.
+     * This enables maintainability, and ensures visual + textual representations match.
+     */
+    const activityData = [
+      { label: 'Morning Routine (5:30-6:00 AM)', hours: 0.5 },
+      { label: 'Meditation (6:00-6:30 AM)', hours: 0.5 },
+      { label: 'Light Exercise (6:30-7:00 AM)', hours: 0.5 },
+      { label: 'Study Session 1 (7:00-8:30 AM)', hours: 1.5 },
+      { label: 'Breakfast & News (8:30-9:00 AM)', hours: 0.5 },
+      { label: 'Study Session 2 (9:00 AM - 12:00 PM)', hours: 3 },
+      { label: 'Short Break (12:00-12:30 PM)', hours: 0.5 },
+      { label: 'Mock Test (12:30-2:30 PM)', hours: 2 },
+      { label: 'Lunch & Relax (2:30-3:30 PM)', hours: 1 },
+      { label: 'Study Session 3 (3:30-5:30 PM)', hours: 2 },
+      { label: 'Break (5:30-6:00 PM)', hours: 0.5 },
+      { label: 'Study Session 4 (6:00-7:30 PM)', hours: 1.5 },
+      { label: 'Dinner & Talk (7:30-8:00 PM)', hours: 0.5 },
+      { label: 'Light Reading (8:00-9:30 PM)', hours: 1.5 },
+      { label: 'Planning (9:30-10:00 PM)', hours: 0.5 },
+      { label: 'Sleep Prep (10:00-10:30 PM)', hours: 0.5 },
+      { label: 'Sleep (10:30 PM - 5:30 AM)', hours: 7 }
+    ];
+
+    // Helpers
+    const totalHours = activityData.reduce((s, a) => s + a.hours, 0);
+
+    // Build accessible table rows
+    function populateTable() {
+      const tbody = document.querySelector('#data_table tbody');
+      tbody.innerHTML = '';
+      activityData.forEach((a, i) => {
+        const pct = Math.round((a.hours / totalHours) * 1000) / 10; // one decimal
+        const tr = document.createElement('tr');
+
+        const tdLabel = document.createElement('td');
+        tdLabel.textContent = a.label;
+        tr.appendChild(tdLabel);
+
+        const timeText = a.label.match(/\(([^)]+)\)$/)?.[1] ?? '';
+        const tdTime = document.createElement('td');
+        tdTime.textContent = timeText;
+        tr.appendChild(tdTime);
+
+        const tdHours = document.createElement('td');
+        tdHours.textContent = a.hours;
+        tr.appendChild(tdHours);
+
+        const tdPct = document.createElement('td');
+        tdPct.textContent = pct + '%';
+        tr.appendChild(tdPct);
+
+        // add accessible association for legend items later
+        tr.id = 'row-' + i;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Build legend
+    function populateLegend(colors) {
+      const legend = document.getElementById('legend');
+      legend.innerHTML = '';
+      activityData.forEach((a, i) => {
+        const item = document.createElement('div');
+        item.className = 'legend-item';
+        item.tabIndex = 0;
+        item.setAttribute('role', 'button');
+        item.setAttribute('aria-pressed', 'false');
+        item.setAttribute('aria-label', `${a.label}, ${a.hours} hours`);
+        item.dataset.index = i;
+
+        const sw = document.createElement('span');
+        sw.className = 'swatch';
+        sw.style.backgroundColor = colors[i % colors.length];
+
+        const label = document.createElement('div');
+        label.className = 'legend-label';
+        label.textContent = a.label;
+
+        item.appendChild(sw);
+        item.appendChild(label);
+
+        // Click and keyboard (Enter / Space) to highlight slice
+        item.addEventListener('click', () => highlightSlice(i));
+        item.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+            e.preventDefault();
+            highlightSlice(i);
+          }
+        });
+
+        legend.appendChild(item);
+      });
+    }
+
+    // CSV export
+    function downloadCSV(){
+      const header = ['Activity','Time','Hours'];
+      const rows = activityData.map(a => {
+        const time = a.label.match(/\(([^)]+)\)$/)?.[1] ?? '';
+        return [a.label.replace(/\(([^)]*)\)$/,'').trim(), time, a.hours];
+      });
+      const csv = [header, ...rows].map(r=> r.map(field => `"${String(field).replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'daily-activity-breakdown.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    // Chart: draw via Google Charts and allow highlighting slices via selection
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    let chart, dataTable, chartOptions, chartColors;
+
+    function drawChart() {
+      // prepare data
+      const dataArr = [['Activity','Hours']];
+      activityData.forEach(a => dataArr.push([a.label, a.hours]));
+      dataTable = google.visualization.arrayToDataTable(dataArr);
+
+      // color array from CSS var
+      const cssColors = getComputedStyle(document.documentElement).getPropertyValue('--colors').trim() || '';
+      chartColors = cssColors.split(',').map(s => s.trim()).filter(s => s);
+
+      chartOptions = {
+        title: '',
+        legend: {position:'bottom', textStyle:{color: getComputedStyle(document.documentElement).getPropertyValue('--text').trim()}},
+        tooltip: {isHtml: true, trigger: 'focus'}, // 'focus' helps keyboard users
+        animation: (typeof window.matchMedia !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ? null : {startup:true,duration:800,easing:'out'},
+        colors: chartColors,
+        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--surface').trim(),
+        pieSliceText: 'none',
+        chartArea: {left:20,top:20,right:20,bottom:80},
+        width: '100%',
+        height: 420
+      };
+
+      const element = document.getElementById('chart_div');
+      chart = new google.visualization.PieChart(element);
+
+      // create accessible HTML tooltip generator (keeps markup minimal)
+      function makeTooltip(label, hours){
+        const pct = Math.round((hours/ totalHours) * 1000)/10;
+        // Keep tooltip text concise and accessible (avoid images)
+        return '<div style="padding:6px 8px;color:#ffffff;">' +
+               '<div style="font-weight:600;">' + label + '</div>' +
+               '<div style="font-size:0.95rem;">' + hours + ' hours • ' + pct + '%</div>' +
+               '</div>';
+      }
+
+      // override dataTable tooltip column
+      for (let r = 0; r < dataTable.getNumberOfRows(); r++){
+        dataTable.setProperty(r, 0, 'tooltip', makeTooltip(dataTable.getValue(r,0), dataTable.getValue(r,1)));
+      }
+
+      chart.draw(dataTable, chartOptions);
+
+      // redraw on resize but debounce
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => chart.draw(dataTable, chartOptions), 150);
+      });
+
+      // When chart selection changes, announce and sync with table highlight
+      google.visualization.events.addListener(chart, 'select', () => {
+        const sel = chart.getSelection();
+        // clear row highlighting
+        document.querySelectorAll('.data-table tr').forEach(tr => tr.style.background='');
+        if (sel.length) {
+          const idx = sel[0].row;
+          const rowEl = document.getElementById('row-' + idx);
+          if (rowEl) rowEl.style.background = 'rgba(118,199,192,0.08)';
+          // announce selection for screen readers
+          const label = dataTable.getValue(idx,0);
+          const hours = dataTable.getValue(idx,1);
+          document.getElementById('chart-live').textContent = `${label}, ${hours} hours selected.`;
+        }
+      });
+    }
+
+    // Highlight slice by setting selection on chart
+    function highlightSlice(index){
+      if (!chart) return;
+      chart.setSelection([{row: index}]);
+      // Move keyboard focus to chart for assistive tech to notice selection
+      document.getElementById('chart_div').focus();
+    }
+
+    // Wire up controls
+    document.addEventListener('DOMContentLoaded', () => {
+      // populate table + legend
+      populateTable();
+
+      // gather colors from computed style; fallback to some defaults if not available
+      const cssColors = getComputedStyle(document.documentElement).getPropertyValue('--colors').trim() || '';
+      const colors = cssColors.split(',').map(s => s.trim()).filter(s => s);
+      populateLegend(colors.length ? colors : ['#4CAF50','#2196F3','#FF9800','#9C27B0']);
+
+      // hook up buttons
+      document.getElementById('toggle-data-table').addEventListener('click', function(){
+        const tbody = document.querySelector('#data_table tbody');
+        const visible = tbody.style.display !== 'none';
+        tbody.style.display = visible ? 'none' : '';
+        this.setAttribute('aria-pressed', (!visible).toString());
+        this.textContent = visible ? 'Show data table' : 'Hide data table';
+      });
+
+      const reduceBtn = document.getElementById('reduce-motion');
+      reduceBtn.addEventListener('click', function(){
+        const reduced = this.getAttribute('aria-pressed') === 'true';
+        if (!reduced){
+          // minimal approach: turn off chart animation
+          chartOptions.animation = null;
+          this.setAttribute('aria-pressed','true');
+          this.textContent = 'Reduced motion: ON';
+        } else {
+          chartOptions.animation = {startup:true,duration:800,easing:'out'};
+          this.setAttribute('aria-pressed','false');
+          this.textContent = 'Reduce motion';
+        }
+        if (chart && dataTable) chart.draw(dataTable, chartOptions);
+      });
+
+      document.getElementById('download-csv').addEventListener('click', downloadCSV);
+
+      // keyboard help: when user focuses the chart, pressing Arrow keys move selection
+      const chartDiv = document.getElementById('chart_div');
+      chartDiv.addEventListener('keydown', (e) => {
+        const n = activityData.length;
+        if (['ArrowLeft','ArrowUp','ArrowRight','ArrowDown','Home','End'].includes(e.key)){
+          e.preventDefault();
+          // determine current selection
+          const sel = chart ? chart.getSelection() : [];
+          let idx = sel.length ? sel[0].row : 0;
+          if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') idx = (idx - 1 + n) % n;
+          if (e.key === 'ArrowRight' || e.key === 'ArrowDown') idx = (idx + 1) % n;
+          if (e.key === 'Home') idx = 0;
+          if (e.key === 'End') idx = n - 1;
+          highlightSlice(idx);
+        }
+      });
+
+      // the chart will be drawn by google.charts callback (drawChart)
+    });
+  </script>
 </body>
 </html>
