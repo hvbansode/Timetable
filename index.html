@@ -3,596 +3,497 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Chronos | Zenith Final</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <title>Chronos | Material Design</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
 
   <style>
+    /* --- MATERIAL DESIGN 3 TOKENS --- */
     :root {
-      --bg-deep: #020204;
-      --glass-surface: rgba(20, 20, 24, 0.7);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --glass-highlight: rgba(255, 255, 255, 0.15);
+      /* Light Theme Default */
+      --md-sys-color-primary: #006495;
+      --md-sys-color-on-primary: #ffffff;
+      --md-sys-color-primary-container: #cbebff;
+      --md-sys-color-on-primary-container: #001f31;
       
-      --text: #ffffff;
-      --muted: #94a3b8;
+      --md-sys-color-background: #fcfcff;
+      --md-sys-color-surface: #fcfcff;
+      --md-sys-color-surface-variant: #dee3ea;
+      --md-sys-color-on-surface: #1a1c1e;
+      --md-sys-color-on-surface-variant: #41474d;
       
-      --accent: #6366f1;
-      --accent-grad: linear-gradient(135deg, #6366f1, #8b5cf6);
-      --danger: #f43f5e;
-      
-      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-      --ease-smooth: cubic-bezier(0.2, 0.8, 0.2, 1);
+      --md-sys-color-outline: #71787e;
+      --md-sys-color-outline-variant: #c1c7ce;
+
+      /* Task Colors (Tonal) */
+      --color-work: #006495;
+      --color-meeting: #6b52a3;
+      --color-health: #006d3a;
+      --color-admin: #8d4f00;
+      --color-rest: #5d5f5f;
+      --color-delete: #ba1a1a;
+
+      --font-family: 'Roboto', sans-serif;
+      --elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+      --elevation-3: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --md-sys-color-primary: #8cd4ff;
+        --md-sys-color-on-primary: #003450;
+        --md-sys-color-primary-container: #004b72;
+        --md-sys-color-on-primary-container: #cbebff;
+        
+        --md-sys-color-background: #1a1c1e;
+        --md-sys-color-surface: #1a1c1e;
+        --md-sys-color-surface-variant: #41474d;
+        --md-sys-color-on-surface: #e2e2e6;
+        --md-sys-color-on-surface-variant: #c1c7ce;
+        
+        --md-sys-color-outline: #8b9198;
+        --md-sys-color-outline-variant: #41474d;
+
+        --color-work: #8cd4ff;
+        --color-meeting: #d5bbff;
+        --color-health: #6ddfa7;
+        --color-admin: #ffb870;
+        --color-rest: #c7c7c7;
+        --color-delete: #ffb4ab;
+        
+        --elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
     
     body {
       margin: 0; height: 100vh; overflow: hidden;
-      background: var(--bg-deep); color: var(--text);
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    canvas#bgCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.5; pointer-events: none; }
-
-    .app {
-      position: relative; z-index: 1; height: 100%; width: 100%;
-      display: grid; grid-template-rows: 70px 1fr;
-    }
-
-    /* --- 1. Header --- */
-    header {
-      display: flex; justify-content: space-between; align-items: center; padding: 0 32px;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-      pointer-events: none;
-    }
-    header > * { pointer-events: auto; }
-
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .logo {
-      width: 32px; height: 32px; background: var(--accent-grad);
-      border-radius: 10px; display: grid; place-items: center; font-weight: 800; font-size: 16px;
-      box-shadow: 0 0 25px rgba(99, 102, 241, 0.3);
-    }
-
-    .top-actions { display: flex; gap: 10px; }
-
-    .nav-btn {
-      height: 40px; padding: 0 16px; border-radius: 12px;
-      background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
-      color: var(--muted); display: flex; align-items: center; gap: 8px;
-      cursor: pointer; transition: 0.2s; font-size: 13px; font-weight: 600;
-      backdrop-filter: blur(4px);
-    }
-    .nav-btn:hover { background: var(--glass-hover); color: #fff; border-color: rgba(255,255,255,0.2); }
-    .nav-btn svg { width: 16px; height: 16px; }
-
-    /* --- 2. Stage --- */
-    .stage { position: relative; display: flex; align-items: center; justify-content: center; height: 100%; }
-
-    .chart-wrapper {
-      width: 70vh; height: 70vh; max-width: 700px; max-height: 700px;
-      position: relative; filter: drop-shadow(0 40px 80px rgba(0,0,0,0.6));
-    }
-    svg { overflow: visible; width: 100%; height: 100%; }
-
-    .track { fill: none; stroke: rgba(255,255,255,0.03); stroke-width: 24; }
-    
-    path.segment {
-      cursor: pointer; transform-origin: 210px 210px;
-      transition: transform 0.4s var(--ease-elastic), filter 0.3s;
-      stroke: rgba(0,0,0,0.5); stroke-width: 1px; vector-effect: non-scaling-stroke;
-    }
-    path.segment:hover, path.segment.active {
-      filter: brightness(1.3) drop-shadow(0 0 20px currentColor);
-    }
-    path.segment.scaled { transform: scale(1.08); }
-
-    .ticks line { stroke: rgba(255,255,255,0.1); stroke-width: 2; }
-    .tick-lbl { font-size: 11px; fill: rgba(255,255,255,0.3); text-anchor: middle; font-family: 'JetBrains Mono'; font-weight: 700; }
-
-    .hub {
-      position: absolute; inset: 50% auto auto 50%; transform: translate(-50%, -50%);
-      width: 200px; height: 200px; border-radius: 50%;
-      background: radial-gradient(circle at 50% 30%, #25252a, #050507);
-      border: 1px solid var(--glass-border);
+      background-color: var(--md-sys-color-background);
+      color: var(--md-sys-color-on-surface);
+      font-family: var(--font-family);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      box-shadow: inset 0 10px 20px rgba(255,255,255,0.05), 0 30px 60px #000;
-      pointer-events: none;
-    }
-    .hub-val { font-size: 52px; font-weight: 800; background: linear-gradient(to bottom, #fff, #64748b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; letter-spacing: -2px; }
-    .hub-sub { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-top: 8px; font-weight: 700; }
-
-    /* --- 3. Dock & Controls --- */
-    .layout-dock {
-      position: absolute; bottom: 40px; right: 40px; top: 100px;
-      display: flex; align-items: flex-end; gap: 16px;
-      pointer-events: none;
     }
 
-    .phantom-controls {
-      pointer-events: auto; display: flex; gap: 8px; align-items: center;
-      margin-bottom: 10px;
-      background: rgba(0,0,0,0.3); border-radius: 18px; padding: 6px;
-      border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(12px);
-      transition: transform 0.4s var(--ease-smooth);
+    /* --- APP CONTAINER --- */
+    .app-bar {
+      position: fixed; top: 0; width: 100%; height: 64px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 400; letter-spacing: -0.5px;
+      color: var(--md-sys-color-on-surface);
+      background: var(--md-sys-color-surface);
+      z-index: 10;
     }
+
+    .stage { position: relative; width: min(90vw, 600px); height: min(90vw, 600px); margin-top: -40px; }
+
+    /* --- SVG CHART --- */
+    svg { overflow: visible; }
     
-    .phantom-btn {
-      width: 42px; height: 42px; border-radius: 12px;
-      background: transparent; color: var(--muted);
-      display: grid; place-items: center; cursor: pointer; transition: 0.2s;
+    /* The Track */
+    .track-bg { 
+      fill: none; 
+      stroke: var(--md-sys-color-surface-variant); 
+      stroke-width: 40; 
+      opacity: 0.3;
     }
-    .phantom-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-    .phantom-btn.active { color: var(--accent); background: rgba(99, 102, 241, 0.1); }
-    .phantom-btn svg { width: 20px; height: 20px; stroke-width: 2; }
 
-    .legend-panel {
-      pointer-events: auto;
-      width: 280px; max-height: 60vh;
-      background: var(--glass-surface); backdrop-filter: blur(24px);
-      border: 1px solid var(--glass-border); border-radius: 24px;
-      display: flex; flex-direction: column; overflow: hidden;
-      transition: 0.4s var(--ease-smooth); transform-origin: bottom right;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    /* Segments */
+    path.segment {
+      fill: none; stroke-width: 40;
+      stroke-linecap: round; /* Rounded ends = Material Style */
+      transition: stroke-width 0.2s cubic-bezier(0.2, 0, 0, 1), filter 0.2s;
+      cursor: pointer;
     }
-    .legend-panel.hidden { width: 0; opacity: 0; transform: translateX(20px); margin-left: -20px; }
+    path.segment:hover { 
+      stroke-width: 48; /* Slight grow on hover */
+      filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2));
+    }
 
-    .l-head { padding: 18px 24px; border-bottom: 1px solid var(--glass-border); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 700; }
-    .l-list { flex: 1; overflow-y: auto; padding: 8px; }
-    .l-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; cursor: pointer; border: 1px solid transparent; transition: 0.2s; }
-    .l-item:hover { background: rgba(255,255,255,0.05); }
-    .l-item.active { background: rgba(255,255,255,0.08); border-color: var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-    .l-dot { width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 8px currentColor; }
-    .l-info { flex: 1; }
-    .l-name { font-size: 13px; font-weight: 600; color: #fff; }
-    .l-time { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono'; margin-top: 2px; }
-    .l-dur { font-weight: 700; font-size: 12px; color: #fff; }
+    /* Draft Wedge */
+    path.draft {
+      fill: none; stroke: var(--md-sys-color-primary); stroke-width: 40;
+      opacity: 0.5; stroke-linecap: round; pointer-events: none;
+      stroke-dasharray: 10 10; /* Dashed to indicate "Pending" */
+    }
 
-    /* HUD */
-    .hud {
-      position: absolute; bottom: 40px; left: 40px; width: 260px;
-      background: var(--glass-surface); border: 1px solid var(--glass-border);
-      border-radius: 20px; padding: 24px; backdrop-filter: blur(20px);
-      transform: translateY(20px); opacity: 0; transition: 0.3s var(--ease-smooth); pointer-events: none;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    }
-    .hud.visible { transform: translateY(0); opacity: 1; }
-    .hud-l { font-size: 11px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; letter-spacing: 1px; font-weight: 700; }
-    .hud-n { font-size: 22px; font-weight: 700; margin-bottom: 4px; color: #fff; }
-    .hud-t { font-family: 'JetBrains Mono'; color: var(--accent); font-size: 15px; }
+    /* Clock Ticks */
+    line.tick { stroke: var(--md-sys-color-outline-variant); stroke-linecap: round; }
+    line.tick.major { stroke: var(--md-sys-color-outline); stroke-width: 2; }
 
-    /* --- Dropdowns --- */
-    .dropdown-wrapper { position: relative; }
-    .dropdown-menu {
-      position: absolute; top: 100%; right: 0; margin-top: 10px; width: 240px;
-      background: #0e0e11; border: 1px solid var(--glass-border);
-      border-radius: 16px; padding: 6px; z-index: 100;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-      display: none; flex-direction: column;
-      max-height: 400px; overflow-y: auto; transform-origin: top right;
+    /* Current Time Indicator */
+    #nowHand {
+      fill: var(--md-sys-color-primary);
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
     }
-    .dropdown-menu.show { display: flex; animation: slideUp 0.15s var(--ease-smooth); }
-    .dd-header { font-size: 10px; text-transform: uppercase; color: #555; padding: 8px 12px 4px; font-weight: 700; }
-    .dd-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; cursor: pointer; transition: 0.15s; color: var(--muted); font-size: 13px; font-weight: 500; }
-    .dd-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
-    .dd-item svg { opacity: 0.7; width: 16px; height: 16px; }
-    .dd-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 4px 0; }
-    .dd-plan-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 8px; color: var(--text); font-size: 13px; cursor: pointer; transition: 0.15s; }
-    .dd-plan-row:hover { background: rgba(255,255,255,0.08); }
-    .dd-plan-row .del-btn { opacity: 0; padding: 4px; border-radius: 4px; color: var(--danger); display: flex; }
-    .dd-plan-row:hover .del-btn { opacity: 1; }
-    .dd-plan-row .del-btn:hover { background: rgba(244, 63, 94, 0.15); }
 
-    /* --- Modal --- */
-    .backdrop {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
-      z-index: 500; display: grid; place-items: center; opacity: 0; pointer-events: none; transition: 0.3s;
+    /* --- CENTRAL HUD (Information Card) --- */
+    .hub {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 200px; height: 200px; border-radius: 50%;
+      background: var(--md-sys-color-surface);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      box-shadow: var(--elevation-2);
+      z-index: 20; pointer-events: none;
+      transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
     }
-    .backdrop.open { opacity: 1; pointer-events: auto; }
-    .modal {
-      width: 90%; max-width: 800px; max-height: 85vh; background: #0b0b0e;
-      border: 1px solid var(--glass-border); border-radius: 28px; display: flex; flex-direction: column;
-      transform: scale(0.95); transition: 0.4s var(--ease-spring); box-shadow: 0 50px 120px #000;
-      overflow: hidden;
-    }
-    .backdrop.open .modal { transform: scale(1); }
+    .hub.active { transform: translate(-50%, -50%) scale(1.05); box-shadow: var(--elevation-3); }
 
-    .m-head { 
-      padding: 28px 32px 20px; border-bottom: 1px solid var(--glass-border); 
-      display: flex; flex-direction: column; gap: 20px; background: rgba(255,255,255,0.01); flex-shrink: 0; 
+    .hud-overline { font-size: 12px; color: var(--md-sys-color-on-surface-variant); font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
+    .hud-time { font-size: 48px; font-weight: 400; color: var(--md-sys-color-on-surface); line-height: 1.1; }
+    .hud-sub { font-size: 14px; color: var(--md-sys-color-primary); font-weight: 500; margin-top: 4px; }
+
+    /* --- BOTTOM SHEET (Selection UI) --- */
+    .sheet-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 90;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
     }
-    .m-top-row { display: flex; justify-content: space-between; align-items: center; }
-    .m-title { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -0.5px; }
+    .sheet-overlay.open { opacity: 1; pointer-events: auto; }
+
+    .bottom-sheet {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--md-sys-color-surface);
+      border-radius: 28px 28px 0 0; /* Material Shape */
+      padding: 24px; padding-bottom: 48px;
+      transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
+      z-index: 100;
+      display: flex; flex-direction: column; gap: 16px;
+      max-width: 600px; margin: 0 auto;
+      box-shadow: var(--elevation-3);
+    }
+    .sheet-overlay.open .bottom-sheet { transform: translateY(0); }
+
+    .sheet-header { font-size: 16px; font-weight: 500; color: var(--md-sys-color-on-surface); text-align: center; margin-bottom: 8px; }
+
+    .chip-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+    }
+
+    .action-chip {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 20px;
+      background: var(--md-sys-color-surface-variant);
+      color: var(--md-sys-color-on-surface-variant);
+      border-radius: 16px; cursor: pointer;
+      transition: 0.2s;
+      font-size: 14px; font-weight: 500;
+    }
+    .action-chip:hover { background: var(--md-sys-color-outline-variant); }
+    .action-chip .icon { font-size: 20px; }
     
-    .done-btn {
-      height: 36px; padding: 0 24px; border-radius: 10px; background: var(--accent);
-      border: none; color: #fff; font-weight: 600; font-size: 14px; cursor: pointer;
-      box-shadow: 0 4px 15px rgba(99,102,241,0.3); transition: 0.2s;
-    }
-    .done-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
-    .done-btn:disabled { background: #333; color: #666; box-shadow: none; cursor: not-allowed; }
-    
-    /* Two-Part Capacity Bar */
-    .capacity-wrapper { 
-      width: 100%; height: 36px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
-      border-radius: 10px; overflow: hidden; display: flex;
-    }
-    .gauge-filled {
-      background: var(--accent-grad); color: #fff; font-weight: 700; font-size: 13px; font-family: 'JetBrains Mono';
-      display: flex; align-items: center; justify-content: center; transition: width 0.5s var(--ease-smooth);
-      overflow: hidden; white-space: nowrap; box-shadow: 2px 0 10px rgba(0,0,0,0.3);
-    }
-    .gauge-empty {
-      flex: 1; color: var(--muted); font-weight: 600; font-size: 13px; font-family: 'JetBrains Mono';
-      display: flex; align-items: center; justify-content: center; background: transparent;
-      overflow: hidden; white-space: nowrap; transition: 0.5s;
-    }
-    .gauge-filled.over { background: var(--danger); }
+    /* Special Delete Chip */
+    .action-chip.delete { background: #ffdad6; color: #410002; grid-column: span 2; justify-content: center; }
+    @media (prefers-color-scheme: dark) { .action-chip.delete { background: #93000a; color: #ffdad6; } }
 
-    .m-body { 
-      flex: 1; overflow-y: auto; padding: 24px 32px; 
-      display: flex; flex-direction: column; gap: 12px; min-height: 0;
+    /* --- FAB / Hint --- */
+    .hint {
+      position: fixed; bottom: 24px; 
+      background: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      padding: 12px 24px; border-radius: 100px;
+      font-size: 14px; font-weight: 500;
+      box-shadow: var(--elevation-2);
+      pointer-events: none; opacity: 0.9;
     }
-    .m-body::-webkit-scrollbar { width: 6px; }
-    .m-body::-webkit-scrollbar-track { background: transparent; }
-    .m-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
-    .m-body::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
-
-    /* CONTROL HUB FOOTER */
-    .m-foot { 
-      padding: 24px; border-top: 1px solid var(--glass-border); 
-      background: rgba(255,255,255,0.02); display: flex; justify-content: center; 
-      flex-shrink: 0;
-    }
-    
-    .control-hub {
-      background: rgba(255,255,255,0.04); backdrop-filter: blur(10px);
-      border: 1px solid var(--glass-border); border-radius: 100px;
-      padding: 6px 24px; display: flex; align-items: center; gap: 24px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4); position: relative;
-    }
-
-    .hub-action {
-      width: 36px; height: 36px; display: grid; place-items: center; cursor: pointer;
-      color: var(--muted); transition: 0.2s; border-radius: 50%;
-    }
-    .hub-action:hover { color: #fff; background: rgba(255,255,255,0.1); }
-    .hub-action svg { width: 20px; height: 20px; stroke-width: 2.5; }
-
-    .add-orb {
-      width: 52px; height: 52px; border-radius: 50%; background: #fff;
-      color: var(--bg-deep); display: grid; place-items: center;
-      box-shadow: 0 0 25px rgba(255,255,255,0.3); cursor: pointer;
-      transition: 0.3s var(--ease-spring); margin-top: -4px;
-    }
-    .add-orb:hover { transform: scale(1.15) translateY(-2px); box-shadow: 0 0 35px rgba(255,255,255,0.5); }
-    .add-orb svg { width: 26px; height: 26px; stroke-width: 3; }
-
-    /* FIXED: Activity Card Layout */
-    .editor-card {
-      display: grid; 
-      /* Adjusted Columns: Color | Input | Time Group | Duration | Delete */
-      grid-template-columns: 48px 1fr 160px 75px 40px; 
-      gap: 16px; align-items: center; padding: 12px; border-radius: 14px; 
-      background: rgba(255,255,255,0.03); border: 1px solid transparent; 
-      transition: 0.2s; position: relative; overflow: hidden; flex-shrink: 0;
-    }
-    .editor-card:hover { background: rgba(255,255,255,0.06); border-color: var(--glass-border); }
-    .editor-card.conflict { border-color: var(--danger); background: rgba(244,63,94,0.05); }
-    
-    .color-swatch {
-      width: 36px; height: 36px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
-      position: relative; cursor: pointer; transition: 0.2s; overflow: hidden;
-    }
-    .color-swatch:hover { transform: scale(1.05); border-color: #fff; }
-    .color-swatch input { position: absolute; opacity: 0; top: -50%; left: -50%; width: 200%; height: 200%; cursor: pointer; }
-
-    .inp-title { background: transparent; border: none; color: #fff; font-size: 15px; font-weight: 600; width: 100%; outline: none; }
-    .inp-title::placeholder { color: rgba(255,255,255,0.2); font-weight: 400; }
-    
-    /* FIXED: Time Group Styling */
-    .time-group { 
-      display: flex; gap: 8px; align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.3); border-radius: 10px; padding: 6px 8px; 
-      border: 1px solid var(--glass-border); 
-    }
-    .time-pill { 
-      padding: 4px 8px; border-radius: 6px; font-family: 'JetBrains Mono'; 
-      font-size: 13px; color: var(--muted); cursor: pointer; transition: 0.2s; 
-    }
-    .time-pill:hover { color: #fff; background: rgba(255,255,255,0.1); }
-    .time-arrow { color: rgba(255,255,255,0.2); font-size: 12px; }
-
-    .dur-badge { font-family: 'JetBrains Mono'; font-size: 13px; color: #fff; text-align: right; opacity: 0.6; }
-
-    .del-action {
-      width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; 
-      color: var(--muted); cursor: pointer; opacity: 0; transition: 0.2s;
-    }
-    .editor-card:hover .del-action { opacity: 1; }
-    .del-action:hover { color: var(--danger); background: rgba(244,63,94,0.1); }
-
-    /* --- Clock --- */
-    .clk-bg { position: fixed; inset: 0; z-index: 600; background: rgba(0,0,0,0.8); display: none; place-items: center; }
-    .clk-bg.show { display: grid; }
-    .clk-card { width: 320px; background: #151518; border: 1px solid var(--glass-border); border-radius: 30px; padding: 24px; backdrop-filter: blur(30px); box-shadow: 0 50px 100px #000; }
-    .clk-disp { text-align: center; font-size: 42px; font-family: 'JetBrains Mono'; font-weight: 700; margin-bottom: 24px; color: #fff; }
-    .clk-face { width: 260px; height: 260px; border-radius: 50%; background: rgba(255,255,255,0.03); margin: 0 auto; position: relative; }
-    .clk-num { position: absolute; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; color: var(--muted); cursor: pointer; transition: 0.2s; }
-    .clk-num:hover { color: #fff; background: rgba(255,255,255,0.1); }
-    .clk-num.sel { background: var(--accent); color: #fff; box-shadow: 0 0 15px var(--accent); }
-    .clk-num.inner { font-size: 11px; opacity: 0.7; }
-
-    @keyframes slideUp { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
   </style>
 </head>
 <body>
 
-<canvas id="bgCanvas"></canvas>
+  <div class="app-bar">Schedule</div>
 
-<div class="app">
-  <header>
-    <div class="brand">
-      <div class="logo">C</div>
-      <h1>Chronos</h1>
+  <div class="stage" id="stage">
+    <svg id="chart" viewBox="0 0 700 700">
+      <circle cx="350" cy="350" r="240" class="track-bg" />
+      
+      <g id="segments"></g>
+      
+      <path id="draftWedge" class="draft" d="" style="display:none" />
+
+      <g id="ticks"></g>
+      
+      <path id="nowHand" d="M 350 80 L 340 60 L 360 60 Z" />
+    </svg>
+
+    <div class="hub" id="hub">
+      <div class="hud-overline">Current Time</div>
+      <div class="hud-time" id="hudMain">00:00</div>
+      <div class="hud-sub" id="hudSub"></div>
     </div>
-    
-    <div class="top-actions">
-      <div class="dropdown-wrapper">
-        <button class="nav-btn" onclick="App.menu('presets', event)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg> 
-          Presets
-        </button>
-        <div class="dropdown-menu" id="menuPresets"></div>
-      </div>
-      <div class="dropdown-wrapper">
-        <button class="nav-btn" onclick="App.menu('data', event)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 
-          Data
-        </button>
-        <div class="dropdown-menu" id="menuData">
-          <div class="dd-item" onclick="App.exp()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export JSON
-          </div>
-          <div class="dd-item" style="position:relative">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="15" x2="12" y2="3" transform="rotate(180 12 9)"/></svg> Import JSON 
-            <input type="file" onchange="App.imp(this)" style="position:absolute;inset:0;opacity:0;cursor:pointer">
-          </div>
+  </div>
+
+  <div class="sheet-overlay" id="sheetOverlay" onclick="App.cancelDraft()">
+    <div class="bottom-sheet" onclick="event.stopPropagation()">
+      <div class="sheet-header">Select Activity</div>
+      <div class="chip-grid" id="chipGrid">
         </div>
-      </div>
-    </div>
-  </header>
-
-  <div class="stage">
-    <div class="chart-wrapper">
-      <svg id="chartSvg" viewBox="0 0 420 420">
-        <defs id="defs"></defs>
-        <circle cx="210" cy="210" r="160" class="track" />
-        <g class="ticks">
-          <line x1="210" y1="20" x2="210" y2="40" /> <line x1="210" y1="380" x2="210" y2="400" /> <line x1="400" y1="210" x2="380" y2="210" /> <line x1="40" y1="210" x2="20" y2="210" />
-        </g>
-        <text x="210" y="15" class="tick-lbl">00:00</text> <text x="210" y="415" class="tick-lbl">12:00</text>
-        <g id="paths"></g>
-      </svg>
-      <div class="hub"><div class="hub-val" id="hubTot">0</div><div class="hub-sub">Allocated</div></div>
-    </div>
-
-    <div class="hud" id="hud"><div class="hud-l">Activity</div><div class="hud-n" id="hudN">...</div><div class="hud-t" id="hudT">...</div></div>
-
-    <div class="layout-dock">
-      <div class="phantom-controls">
-        <div class="phantom-btn" onclick="App.edit()" title="Edit"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
-        <div class="phantom-btn active" id="tgLeg" onclick="App.toggleLeg()" title="Toggle Legend"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg></div>
-      </div>
-      <div class="legend-panel" id="legPanel"><div class="l-head">Schedule Breakdown</div><div class="l-list" id="legList"></div></div>
     </div>
   </div>
-</div>
 
-<div class="backdrop" id="modal">
-  <div class="modal">
-    <div class="m-head">
-      <div class="m-top-row">
-        <div class="m-title">Schedule Editor</div>
-        <button class="done-btn" id="doneBtn" onclick="App.closeEdit()">Done</button>
-      </div>
-      <div class="capacity-wrapper">
-        <div class="gauge-filled" id="capFill">16h 30m</div>
-        <div class="gauge-empty" id="capEmpty">7h 30m</div>
-      </div>
-    </div>
-
-    <div class="m-body" id="rows"></div>
-    
-    <div class="m-foot">
-      <div class="control-hub">
-        <div class="hub-action" onclick="App.undo()" title="Undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg></div>
-        <div class="add-orb" onclick="App.add()" title="Add Activity"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
-        <div class="hub-action" onclick="App.redo()" title="Redo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/></svg></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="clk-bg" id="clk">
-  <div class="clk-card">
-    <div class="clk-disp">
-      <span id="cH" style="color:#fff;cursor:pointer" onclick="App.cm('h')">12</span><span style="color:#444">:</span><span id="cM" style="color:#666;cursor:pointer" onclick="App.cm('m')">00</span>
-    </div>
-    <div class="clk-face" id="cDial"></div>
-    <div style="display:flex;justify-content:space-between;margin-top:20px">
-      <button class="nav-btn" onclick="document.getElementById('clk').classList.remove('show')">Cancel</button>
-      <button class="nav-btn" style="background:var(--accent);color:#fff;border-color:var(--accent)" onclick="App.cSet()">Set</button>
-    </div>
-  </div>
-</div>
+  <div class="hint">Drag on track to plan</div>
 
 <script>
+/* --- MATERIAL APP ENGINE --- */
 window.App = (() => {
-  const DEF = [
-    { label: 'Sleep', start: '23:00', end: '07:00', color: '#6366f1' },
-    { label: 'Morning Protocol', start: '07:00', end: '08:30', color: '#f43f5e' },
-    { label: 'Deep Work I', start: '08:30', end: '11:30', color: '#0ea5e9' },
-    { label: 'Lunch & Reset', start: '11:30', end: '13:00', color: '#10b981' },
-    { label: 'Deep Work II', start: '13:00', end: '15:00', color: '#8b5cf6' },
-    { label: 'Admin', start: '15:00', end: '17:00', color: '#f59e0b' },
-    { label: 'Leisure', start: '17:00', end: '21:00', color: '#ec4899' },
-    { label: 'Wind Down', start: '21:00', end: '23:00', color: '#64748b' }
-  ];
-  
-  let items=[], hist=[], hIdx=-1, lOpen=true, sel=-1;
-  let savedPlans = [];
-
-  const $ = id => document.getElementById(id);
-  const ui = {
-    svg:$('paths'), defs:$('defs'), hub:$('hubTot'), leg:$('legList'), pan:$('legPanel'),
-    hud:$('hud'), hn:$('hudN'), ht:$('hudT'),
-    mod:$('modal'), rows:$('rows'), cFill:$('capFill'), cEmp:$('capEmpty'),
-    clk:$('clk'), dial:$('cDial'), ch:$('cH'), cm:$('cM'), menuP:$('menuPresets')
+  const S = {
+    cx: 350, cy: 350, r: 240,
+    // Pre-populated data
+    tasks: [
+      { id: 1, label: 'Deep Work', start: 540, end: 690, color: 'var(--color-work)', icon: 'psychology' }, // 09:00
+      { id: 2, label: 'Lunch', start: 720, end: 780, color: 'var(--color-health)', icon: 'restaurant' }    // 12:00
+    ],
+    draft: null,
+    isDragging: false,
+    editingId: null
   };
 
+  const $ = id => document.getElementById(id);
+  
+  // Helper: Minutes <-> Degrees
+  const toDeg = m => (m/1440)*360;
+  const toRad = d => (d-90) * Math.PI/180;
+
+  // Calculate coordinates for SVG paths
+  const getCoords = (deg, rad) => ({
+    x: S.cx + rad * Math.cos(toRad(deg)),
+    y: S.cx + rad * Math.sin(toRad(deg))
+  });
+
+  // Create SVG Arc Path string
+  // Note: Using stroke-dasharray or simple arcs for Material look, but keeping path logic for precision
+  const drawArc = (startM, endM, radius) => {
+    const sDeg = toDeg(startM);
+    const eDeg = toDeg(endM);
+    const large = (eDeg - sDeg) > 180 ? 1 : 0;
+    const p1 = getCoords(sDeg, radius);
+    const p2 = getCoords(eDeg, radius);
+    // Move to start, Arc to end. We use Stroke for thickness, not fill.
+    return `M ${p1.x} ${p1.y} A ${radius} ${radius} 0 ${large} 1 ${p2.x} ${p2.y}`;
+  };
+
+  const getMinutesFromXY = (x, y) => {
+    const rect = $('chart').getBoundingClientRect();
+    // normalize coordinates relative to SVG viewbox (700x700)
+    const scaleX = 700 / rect.width;
+    const scaleY = 700 / rect.height;
+    const svgX = (x - rect.left) * scaleX;
+    const svgY = (y - rect.top) * scaleY;
+
+    let angle = Math.atan2(svgY - S.cy, svgX - S.cx) * 180 / Math.PI + 90;
+    if (angle < 0) angle += 360;
+    
+    // Snap to 15 mins (3.75 degrees)
+    const snapped = Math.round(angle / 3.75) * 3.75;
+    return Math.round((snapped / 360) * 1440) % 1440;
+  };
+
+  // --- INITIALIZATION ---
   const init = () => {
-    try { items = JSON.parse(localStorage.getItem('chronos_current')) || JSON.parse(JSON.stringify(DEF)); } catch(e){ items=JSON.parse(JSON.stringify(DEF)); }
-    try { savedPlans = JSON.parse(localStorage.getItem('chronos_saved_plans')) || []; } catch(e){ savedPlans=[]; }
-    rec(); render(); bg();
-    document.onclick = e => { 
-      if(!e.target.closest('.dropdown-wrapper')) closeMenus();
-      if(e.target.id === 'modal') closeEdit();
-      if(!e.target.closest('path') && !e.target.closest('.l-item') && !e.target.closest('.layout-dock') && sel !== -1) select(-1); 
+    drawTicks();
+    render();
+    setInterval(updateClock, 1000);
+    setupInteractions();
+    buildBottomSheet();
+    updateClock();
+  };
+
+  const drawTicks = () => {
+    const g = $('ticks');
+    for (let i=0; i<24; i++) {
+      const deg = (i/24)*360;
+      const rStart = i%6===0 ? S.r - 30 : S.r - 15; // Length of tick
+      const rEnd = S.r + 30;
+      const p1 = getCoords(deg, rStart);
+      const p2 = getCoords(deg, rEnd);
+      
+      const l = document.createElementNS('http://www.w3.org/2000/svg','line');
+      l.setAttribute('x1',p1.x); l.setAttribute('y1',p1.y); 
+      l.setAttribute('x2',p2.x); l.setAttribute('y2',p2.y);
+      l.setAttribute('class', i%6===0 ? 'tick major' : 'tick');
+      g.append(l);
+    }
+  };
+
+  // --- RENDER LOOP ---
+  const render = () => {
+    const g = $('segments'); g.innerHTML = '';
+    S.tasks.sort((a,b)=>a.start-b.start).forEach(t => {
+      const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+      // Draw arc at radius
+      p.setAttribute('d', drawArc(t.start, t.end, S.r));
+      p.setAttribute('class', 'segment');
+      p.setAttribute('stroke', t.color);
+      
+      // Interactions
+      p.onmousedown = (e) => { e.stopPropagation(); openSheet(t); };
+      p.onmouseenter = () => updateHudInfo(t.label, `${formatTime(t.start)} - ${formatTime(t.end)}`);
+      p.onmouseleave = resetHud;
+      g.append(p);
+    });
+  };
+
+  // --- INPUT HANDLING ---
+  const setupInteractions = () => {
+    const svg = $('chart');
+    
+    svg.onmousedown = (e) => {
+      if(e.target.classList.contains('segment')) return; // Edit mode handled by segment click
+      
+      S.isDragging = true;
+      const m = getMinutesFromXY(e.clientX, e.clientY);
+      
+      S.draft = { start: m, end: m + 15 }; 
+      $('draftWedge').style.display = 'block';
+      $('hub').classList.add('active');
+      updateDraftVisual();
+    };
+
+    window.onmousemove = (e) => {
+      if(!S.isDragging) return;
+      const currentM = getMinutesFromXY(e.clientX, e.clientY);
+      
+      // Basic clamp logic for demo
+      if (Math.abs(currentM - S.draft.start) < 720) { // prevent wrapping weirdness
+         S.draft.end = currentM;
+         // Ensure minimum 15 mins
+         if(S.draft.end <= S.draft.start) S.draft.end = S.draft.start + 15;
+         updateDraftVisual();
+      }
+    };
+
+    window.onmouseup = () => {
+      if(S.isDragging) {
+        S.isDragging = false;
+        $('hub').classList.remove('active');
+        openSheet(); // Open selection menu
+      }
     };
   };
 
-  const renderPresets = () => {
-    let h = `<div class="dd-header">System</div><div class="dd-item" onclick="App.load('def')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Circadian Optimal</div><div class="dd-divider"></div><div class="dd-header">My Plans</div>`;
-    if(savedPlans.length===0) h+=`<div style="padding:8px 12px;font-size:12px;color:#444;font-style:italic">No saved plans</div>`;
-    else savedPlans.forEach((p,i)=>{
-      h+=`<div class="dd-plan-row" onclick="App.loadPlan(${i})"><span>${p.name}</span>
-          <div class="del-btn" onclick="App.delPlan(${i},event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:14px;height:14px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div></div>`;
-    });
-    h+=`<div class="dd-divider"></div><div class="dd-header">Actions</div><div class="dd-item" style="color:var(--accent)" onclick="App.saveCurrent()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> Save Current Plan</div><div class="dd-item" style="color:var(--danger)" onclick="App.clear()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6L6 18M6 6l12 12"/></svg> Clear Board</div>`;
-    ui.menuP.innerHTML = h;
-  };
-  const saveCurrent = () => { const name = prompt("Name:", "My Routine"); if(name) { savedPlans.push({ name, items: JSON.parse(JSON.stringify(items)) }); localStorage.setItem('chronos_saved_plans', JSON.stringify(savedPlans)); renderPresets(); }};
-  const loadPlan = (i) => { items = JSON.parse(JSON.stringify(savedPlans[i].items)); rec(); render(); };
-  const delPlan = (i,e) => { e.stopPropagation(); if(confirm('Delete?')){ savedPlans.splice(i,1); localStorage.setItem('chronos_saved_plans', JSON.stringify(savedPlans)); renderPresets(); } };
-
-  const rec = () => { hist=hist.slice(0,hIdx+1); hist.push(JSON.stringify(items)); hIdx++; };
-  const undo = () => { if(hIdx>0){ hIdx--; items=JSON.parse(hist[hIdx]); ref(); } };
-  const redo = () => { if(hIdx<hist.length-1){ hIdx++; items=JSON.parse(hist[hIdx]); ref(); } };
-  const ref = () => { render(); if(ui.mod.classList.contains('open')) editRows(); };
-
-  const formatDur = (m) => { const h=Math.floor(m/60), n=Math.round(m%60); return h>0 && n>0 ? `${h}h ${n}m` : (h>0 ? `${h}h` : `${n}m`); };
-
-  const render = () => {
-    ui.svg.innerHTML=''; ui.defs.innerHTML=''; ui.leg.innerHTML='';
-    const sorted = [...items].sort((a,b)=>toM(a.start)-toM(b.start));
-    let t=0;
-
-    sorted.forEach((it, i) => {
-      const dur = getD(it.start, it.end); t+=dur;
-      const gid = `g${i}`; const origIdx = items.indexOf(it);
-      const g=document.createElementNS('http://www.w3.org/2000/svg','linearGradient'); g.id=gid; g.setAttribute('gradientTransform','rotate(90)'); g.innerHTML=`<stop offset="0%" stop-color="${it.color}"/><stop offset="50%" stop-color="${lite(it.color)}"/><stop offset="100%" stop-color="${it.color}"/>`; ui.defs.append(g);
-
-      const sM=toM(it.start), aS=(sM/1440)*360-90, aE=aS+(dur/1440)*360, r=160, cx=210, cy=210, rad=d=>d*Math.PI/180;
-      const x1=cx+r*Math.cos(rad(aS)), y1=cy+r*Math.sin(rad(aS)), x2=cx+r*Math.cos(rad(aE)), y2=cy+r*Math.sin(rad(aE));
-      const lg=dur>720?1:0; const d=`M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${lg} 1 ${x2} ${y2} Z`;
-
-      const p=document.createElementNS('http://www.w3.org/2000/svg','path'); 
-      p.setAttribute('d',d); p.setAttribute('class','segment'); p.setAttribute('fill',`url(#${gid})`); p.setAttribute('data-idx',origIdx);
-      p.style.transformOrigin = '210px 210px';
-      
-      const l=document.createElement('div'); l.className='l-item'; l.setAttribute('data-idx',origIdx);
-      l.innerHTML=`<div class="l-dot" style="background:${it.color};box-shadow:0 0 10px ${it.color}"></div><div class="l-info"><div class="l-name">${it.label}</div><div class="l-time">${it.start}-${it.end}</div></div><div class="l-dur">${formatDur(dur)}</div>`;
-
-      const act = (e) => { e.stopPropagation(); select(origIdx); };
-      p.onclick=act; l.onclick=act;
-      p.onmouseenter=()=>hover(origIdx,true); p.onmouseleave=()=>hover(origIdx,false);
-      l.onmouseenter=()=>hover(origIdx,true); l.onmouseleave=()=>hover(origIdx,false);
-
-      ui.svg.append(p); ui.leg.append(l);
-    });
-    ui.hub.innerText=formatDur(t); localStorage.setItem('chronos_current', JSON.stringify(items));
-    if(sel!==-1) highlight(sel);
-  };
-
-  const select = (i) => { sel=i; highlight(i); };
-  const highlight = (i) => {
-    Array.from(ui.svg.children).forEach(p=>{p.classList.remove('active','scaled')}); Array.from(ui.leg.children).forEach(l=>l.classList.remove('active'));
-    if(i!==-1){
-      const p=ui.svg.querySelector(`path[data-idx="${i}"]`), l=ui.leg.querySelector(`div[data-idx="${i}"]`);
-      if(p){ ui.svg.appendChild(p); p.classList.add('active','scaled'); }
-      if(l){ l.classList.add('active'); if(lOpen)l.scrollIntoView({behavior:'smooth',block:'nearest'}); }
-      showHud(items[i]);
-    } else ui.hud.classList.remove('visible');
-  };
-  const hover = (i, act) => { if(sel!==-1)return; if(act){ highlight(i); if(!lOpen) showHud(items[i]); } else highlight(-1); };
-  const showHud = (it) => { ui.hn.innerText=it.label; ui.ht.innerText=`${it.start} - ${it.end}`; ui.ht.style.color=it.color; ui.hud.classList.add('visible'); };
-
-  const editRows = () => {
-    ui.rows.innerHTML=''; let t=0;
-    const map=new Array(1440).fill(0);
-    items.forEach(x=>{ const s=toM(x.start), d=getD(x.start,x.end); for(let k=0;k<d;k++) map[(s+k)%1440]++; });
+  const updateDraftVisual = () => {
+    $('draftWedge').setAttribute('d', drawArc(S.draft.start, S.draft.end, S.r));
     
-    items.forEach((it, i) => {
-      const d=getD(it.start,it.end); t+=d; const s=toM(it.start); let c=false; for(let k=0;k<d;k++)if(map[(s+k)%1440]>1)c=true;
-      const el=document.createElement('div'); el.className=`editor-card ${c?'conflict':''}`;
-      el.innerHTML=`
-        <div class="color-swatch" style="background:${it.color};border-color:${it.color}"><input type="color" value="${it.color}" onchange="App.upd(${i},'color',this.value)"></div>
-        <input class="inp-title" value="${it.label}" placeholder="Activity" onchange="App.upd(${i},'label',this.value)">
-        <div class="time-group">
-          <div class="time-pill" onclick="App.pk(${i},'start','${it.start}')">${it.start}</div>
-          <span class="time-arrow">→</span>
-          <div class="time-pill" onclick="App.pk(${i},'end','${it.end}')">${it.end}</div>
-        </div>
-        <div class="dur-badge">${formatDur(d)}</div>
-        <div class="del-action" onclick="App.del(${i})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>
-      `;
-      ui.rows.append(el);
-    });
-    
-    const pct = (t/(24*60))*100;
-    ui.cFill.style.width = `${Math.min(100, pct)}%`;
-    ui.cFill.innerText = formatDur(t);
-    ui.cFill.className = `gauge-filled ${t > 24*60 ? 'over' : ''}`;
-    ui.cEmp.innerText = formatDur(Math.max(0, 1440 - t));
-    
-    const done = document.getElementById('doneBtn');
-    done.disabled = t > 24*60;
-    done.style.opacity = t > 24*60 ? 0.5 : 1;
+    const dur = S.draft.end - S.draft.start;
+    const h = Math.floor(dur/60); const m = dur%60;
+    $('hudMain').innerText = `${h}h ${m}m`;
+    $('hudSub').innerText = "Release to set";
+    $('hudSub').style.color = 'var(--md-sys-color-primary)';
   };
 
-  const upd = (i,k,v) => { if(k==='dur') items[i].end=fmt(toM(items[i].start)+parseFloat(v)*60); else if(k==='start'){ const d=getD(items[i].start,items[i].end); items[i].start=v; items[i].end=fmt(toM(v)+d); } else items[i][k]=v; rec(); editRows(); };
+  // --- BOTTOM SHEET (UI) ---
+  const activityTypes = [
+    { l: 'Deep Work', c: 'var(--color-work)', i: 'psychology' },
+    { l: 'Meeting', c: 'var(--color-meeting)', i: 'groups' },
+    { l: 'Health', c: 'var(--color-health)', i: 'fitness_center' },
+    { l: 'Admin', c: 'var(--color-admin)', i: 'folder' },
+    { l: 'Rest', c: 'var(--color-rest)', i: 'coffee' }
+  ];
 
-  let ckCb, ckM='h', ckT={h:0,m:0};
-  const pk=(i,k,v)=>{ const m=toM(v); ckT={h:Math.floor(m/60),m:m%60}; ckCb=val=>upd(i,k,val); cm('h'); ui.clk.classList.add('show'); };
-  const cm=(m)=>{ ckM=m; ui.ch.style.color=m==='h'?'#fff':'#666'; ui.cm.style.color=m==='m'?'#fff':'#666'; ui.dial.innerHTML='';
-    const cnt=ckM==='h'?24:12;
-    for(let j=0;j<cnt;j++){
-      let n=j, r=110; if(ckM==='h'){ if(j>11)r=75; } else n=j*5;
-      const a=(n%12)*30-90, rad=a*Math.PI/180, x=130+r*Math.cos(rad), y=130+r*Math.sin(rad);
-      const d=document.createElement('div'); d.className=`clk-num ${((ckM==='h'&&ckT.h===n)||(ckM==='m'&&Math.abs(ckT.m-n)<3))?'sel':''} ${r===75?'inner':''}`; d.innerText=n; d.style.left=(x-17)+'px'; d.style.top=(y-17)+'px';
-      d.onclick=()=>{ if(ckM==='h'){ckT.h=n;cm('m');}else{ckT.m=n;cSet();} }; ui.dial.append(d);
+  const buildBottomSheet = () => {
+    const grid = $('chipGrid');
+    // Regular Actions
+    activityTypes.forEach(type => {
+      const el = document.createElement('div');
+      el.className = 'action-chip';
+      el.innerHTML = `<span class="material-symbols-rounded icon" style="color:${type.c}">${type.i}</span> ${type.l}`;
+      el.onclick = () => confirmSelection(type);
+      grid.append(el);
+    });
+
+    // Delete Action (Only visible when editing)
+    const del = document.createElement('div');
+    del.className = 'action-chip delete';
+    del.id = 'btnDelete';
+    del.innerHTML = `<span class="material-symbols-rounded icon">delete</span> Remove Block`;
+    del.onclick = () => {
+      S.tasks = S.tasks.filter(t => t.id !== S.editingId);
+      closeSheet();
+    };
+    grid.append(del);
+  };
+
+  const openSheet = (taskToEdit = null) => {
+    const sheet = $('sheetOverlay');
+    const title = sheet.querySelector('.sheet-header');
+    const btnDelete = $('btnDelete');
+
+    if (taskToEdit) {
+      S.editingId = taskToEdit.id;
+      title.innerText = "Edit Block";
+      btnDelete.style.display = 'flex';
+      // Visual feedback
+      updateHudInfo("Editing", taskToEdit.label);
+    } else {
+      S.editingId = null;
+      title.innerText = "Categorize Time";
+      btnDelete.style.display = 'none';
+    }
+    
+    sheet.classList.add('open');
+  };
+
+  const closeSheet = () => {
+    $('sheetOverlay').classList.remove('open');
+    $('draftWedge').style.display = 'none';
+    render();
+    resetHud();
+  };
+
+  const confirmSelection = (type) => {
+    if (S.editingId) {
+      const t = S.tasks.find(x => x.id === S.editingId);
+      t.label = type.l; t.color = type.c; t.icon = type.i;
+    } else {
+      // Create new
+      S.tasks.push({
+        id: Date.now(),
+        label: type.l,
+        color: type.c,
+        icon: type.i,
+        start: S.draft.start,
+        end: S.draft.end
+      });
+    }
+    closeSheet();
+  };
+
+  const cancelDraft = () => {
+    closeSheet();
+  };
+
+  window.App.cancelDraft = cancelDraft; // Expose for overlay click
+
+  // --- HUD UTILS ---
+  const formatTime = m => {
+    const h = Math.floor(m/60); const mn = m%60;
+    return `${String(h).padStart(2,'0')}:${String(mn).padStart(2,'0')}`;
+  };
+
+  const updateClock = () => {
+    const now = new Date();
+    const m = now.getHours()*60 + now.getMinutes();
+    const deg = (m/1440)*360;
+    $('nowHand').setAttribute('transform', `rotate(${deg} 350 350)`);
+    
+    // Only update text if not interacting
+    if(!$('hub').classList.contains('active') && !$('sheetOverlay').classList.contains('open')) {
+      $('hudMain').innerText = formatTime(m);
+      $('hudSub').innerText = "";
+      $('hudSub').style.color = 'transparent';
     }
   };
-  const cSet=()=>{ if(ckCb)ckCb(fmt(ckT.h*60+ckT.m)); ui.clk.classList.remove('show'); };
 
-  const closeMenus = () => document.querySelectorAll('.dropdown-menu').forEach(d=>d.classList.remove('show'));
-  const menu = (id,e) => { e.stopPropagation(); closeMenus(); if(id==='presets')renderPresets(); document.getElementById('menu'+(id==='presets'?'Presets':'Data')).classList.toggle('show'); };
-  const toggleLeg = () => { lOpen=!lOpen; $('tgLeg').classList.toggle('active'); ui.pan.classList.toggle('hidden'); if(!lOpen && sel!==-1) showHud(items[sel]); else ui.hud.classList.remove('visible'); };
-  const toM=t=>{const[h,m]=t.split(':').map(Number);return h*60+m;};
-  const fmt=m=>{m=(Math.round(m)+1440)%1440;return `${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`};
-  const getD=(s,e)=>{let d=toM(e)-toM(s);return d<0?d+1440:d;};
-  const lite=(c)=>{const n=parseInt(c.slice(1),16), a=60, r=(n>>16)+a, g=((n>>8)&0xFF)+a, b=(n&0xFF)+a; return '#'+(0x1000000+(r<255?r:255)*0x10000+(g<255?g:255)*0x100+(b<255?b:255)).toString(16).slice(1);};
-  const bg=()=>{ const c=$('bgCanvas'), x=c.getContext('2d'); let w,h,s=[]; const rsz=()=>{w=c.width=window.innerWidth;h=c.height=window.innerHeight;}; window.onresize=rsz; rsz(); for(let i=0;i<70;i++)s.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.5,v:Math.random()*0.5}); const loop=()=>{x.clearRect(0,0,w,h); x.fillStyle='rgba(255,255,255,0.4)'; s.forEach(p=>{p.y-=p.v;if(p.y<0)p.y=h;x.beginPath();x.arc(p.x,p.y,p.r,0,6.28);x.fill();}); requestAnimationFrame(loop);}; loop(); };
-
-  return { init, undo, redo, menu, toggleLeg, edit:()=>{rec();editRows();ui.mod.classList.add('open')}, closeEdit:()=>{ui.mod.classList.remove('open');render()},
-    add:()=>{const l=items[items.length-1]||{end:'00:00'}; items.push({label:'New',start:l.end,end:fmt(toM(l.end)+60),color:'#888'}); rec(); editRows(); ui.rows.scrollTop=ui.rows.scrollHeight},
-    del:(i)=>{items.splice(i,1);rec();editRows()}, upd, pk, cm, cSet, clear:()=>{items=[];rec();render();closeMenus()},
-    load:(t)=>{items=t==='def'?JSON.parse(JSON.stringify(DEF)):(JSON.parse(localStorage.getItem('chronos_current'))||[]);rec();render()},
-    saveCurrent, loadPlan, delPlan,
-    exp:()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(items)],{type:'application/json'}));a.download='plan.json';a.click()},
-    imp:(el)=>{const r=new FileReader();r.onload=e=>{try{items=JSON.parse(e.target.result);rec();render();}catch(x){}};if(el.files[0])r.readAsText(el.files[0])}
+  const updateHudInfo = (main, sub) => {
+    $('hudMain').innerText = main;
+    $('hudSub').innerText = sub;
+    $('hudSub').style.color = 'var(--md-sys-color-primary)';
   };
+
+  const resetHud = () => {
+    updateClock();
+  };
+
+  return { init, cancelDraft };
 })();
 
 window.onload = window.App.init;
